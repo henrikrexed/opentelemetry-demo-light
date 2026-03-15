@@ -1,5 +1,5 @@
 sprint: "Sprint 1 - Scaffolding & Infrastructure"
-updated: "2026-03-14"
+updated: "2026-03-15"
 
 epics:
   - id: epic-1
@@ -148,14 +148,14 @@ epics:
 
   - id: epic-10
     name: "Documentation"
-    status: backlog
+    status: done
     stories:
       - id: "10.1"
         name: "Root README"
-        status: backlog
+        status: done
       - id: "10.2"
         name: "BYOB Backend Guides"
-        status: backlog
+        status: done
       - id: "10.3"
         name: "Per-Service READMEs"
-        status: backlog
+        status: done
