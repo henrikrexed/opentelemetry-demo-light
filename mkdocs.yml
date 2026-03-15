@@ -1,0 +1,42 @@
+site_name: OpenTelemetry Demo Light
+site_description: A lightweight OTel demo — 5 microservices in 5 languages
+repo_url: https://github.com/your-org/opentelemetry-demo-light
+
+theme:
+  name: material
+  palette:
+    - scheme: default
+      primary: indigo
+      accent: teal
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - content.code.copy
+
+markdown_extensions:
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+  - admonition
+  - pymdownx.details
+  - attr_list
+  - tables
+
+nav:
+  - Home: index.md
+  - Architecture: architecture.md
+  - Getting Started:
+      - Docker Compose: getting-started/docker.md
+      - Kubernetes: getting-started/kubernetes.md
+      - Helm Values Reference: getting-started/helm-values.md
+  - Services:
+      - Frontend (Node.js): services/frontend.md
+      - Product Catalog (Go): services/product-catalog.md
+      - Cart (Java): services/cart.md
+      - Checkout (Python): services/checkout.md
+      - Payment (Rust): services/payment.md
+  - Observability: observability.md

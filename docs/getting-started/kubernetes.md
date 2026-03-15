@@ -1,0 +1,80 @@
+# Kubernetes Deployment
+
+Two deployment options: **Kustomize** (simple) and **Helm** (configurable).
+
+## Option A: Kustomize
+
+```bash
+kubectl apply -k kubernetes/
+```
+
+This deploys all services into the `otel-demo-light` namespace.
+
+### Access the Frontend
+
+```bash
+# Port-forward
+kubectl port-forward -n otel-demo-light svc/frontend 8080:8080
+
+# Or use NodePort (pre-configured at 30080)
+open http://<node-ip>:30080
+```
+
+### Access Locust UI
+
+```bash
+kubectl port-forward -n otel-demo-light svc/load-generator 8089:8089
+```
+
+## Option B: Helm
+
+```bash
+helm install demo helm/opentelemetry-demo-light/
+```
+
+### With Custom Values
+
+```bash
+helm install demo helm/opentelemetry-demo-light/ \
+  --set collector.resources.limits.memory=512Mi \
+  --set loadGenerator.users=10
+```
+
+### With a values file
+
+```bash
+helm install demo helm/opentelemetry-demo-light/ -f my-values.yaml
+```
+
+See the [Helm Values Reference](helm-values.md) for all options.
+
+### BYOB (No Collector)
+
+```bash
+helm install demo helm/opentelemetry-demo-light/ \
+  --set collector.enabled=false \
+  --set otlp.endpoint=https://your-backend:4317
+```
+
+### With Gateway API
+
+```bash
+helm install demo helm/opentelemetry-demo-light/ \
+  --set gateway.enabled=true \
+  --set gateway.provider=istio \
+  --set gateway.hostname=demo.example.com
+```
+
+## Cleanup
+
+=== "Kustomize"
+
+    ```bash
+    kubectl delete -k kubernetes/
+    ```
+
+=== "Helm"
+
+    ```bash
+    helm uninstall demo
+    ```
