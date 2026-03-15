@@ -3,7 +3,7 @@
 
 collector:
   enabled: true
-  image: otel/opentelemetry-collector-contrib:0.98.0
+  image: otel/opentelemetry-collector-contrib:0.147.0
   replicas: 1
   resources:
     limits:
