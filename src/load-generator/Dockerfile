@@ -1,11 +1,13 @@
-FROM grafana/xk6:latest AS builder
+FROM golang:1.23-alpine AS builder
 
-RUN xk6 build \
-  --with github.com/grafana/xk6-output-opentelemetry
+RUN apk add --no-cache git gcc musl-dev
+RUN go install go.k6.io/xk6/cmd/xk6@latest
+
+RUN xk6 build   --with github.com/grafana/xk6-output-opentelemetry@latest
 
 FROM alpine:3.19
 
-COPY --from=builder /xk6/k6 /usr/bin/k6
+COPY --from=builder /go/bin/k6 /usr/bin/k6
 COPY test.js /scripts/test.js
 COPY run.sh /scripts/run.sh
 
