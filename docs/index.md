@@ -55,3 +55,4 @@ open http://localhost:8080
 | [Cart](services/cart.md) | Java | Java Agent (zero code) | 7070 |
 | [Checkout](services/checkout.md) | Python | Auto + Manual hybrid | 5050 |
 | [Payment](services/payment.md) | Rust | Manual instrumentation | 6060 |
+
