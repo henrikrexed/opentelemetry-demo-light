@@ -1,0 +1,48 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Release.Name }}-cart
+  labels:
+    {{- include "otel-demo.labels" . | nindent 4 }}
+spec:
+  selector:
+    {{- include "otel-demo.selectorLabels" (dict "name" "cart" "root" .) | nindent 4 }}
+  ports:
+    - port: {{ .Values.cart.port }}
+      targetPort: {{ .Values.cart.port }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-cart
+  labels:
+    {{- include "otel-demo.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.cart.replicas }}
+  selector:
+    matchLabels:
+      {{- include "otel-demo.selectorLabels" (dict "name" "cart" "root" .) | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "otel-demo.selectorLabels" (dict "name" "cart" "root" .) | nindent 8 }}
+    spec:
+      containers:
+        - name: cart
+          image: {{ include "otel-demo.image" (dict "img" .Values.images.cart) }}
+          imagePullPolicy: {{ .Values.images.cart.pullPolicy }}
+          ports:
+            - containerPort: {{ .Values.cart.port }}
+          env:
+            - name: OTEL_SERVICE_NAME
+              value: cart
+            - name: JAVA_TOOL_OPTIONS
+              value: "-javaagent:/app/opentelemetry-javaagent.jar {{ .Values.cart.jvmOpts }}"
+            {{- include "otel-demo.otelEnv" . | nindent 12 }}
+          resources:
+            {{- toYaml .Values.cart.resources | nindent 12 }}
+          readinessProbe:
+            exec:
+              command: ["/app/grpc_health_probe", "-addr=localhost:{{ .Values.cart.port }}"]
+            initialDelaySeconds: 15
+            periodSeconds: 5

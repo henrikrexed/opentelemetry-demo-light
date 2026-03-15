@@ -1,0 +1,135 @@
+## OpenTelemetry Demo Light — Helm Values
+## See docs/getting-started/helm-values.md for full reference.
+
+collector:
+  enabled: true
+  image: otel/opentelemetry-collector-contrib:0.98.0
+  replicas: 1
+  resources:
+    limits:
+      memory: 256Mi
+    requests:
+      memory: 64Mi
+
+# When collector.enabled=false, services send OTLP directly here
+otlp:
+  endpoint: "http://otel-collector:4317"
+  protocol: grpc  # grpc or http
+
+metrics:
+  aggregation: cumulative  # cumulative or delta
+
+gateway:
+  enabled: false
+  provider: ""       # istio, cilium, envoy, nginx
+  hostname: ""       # e.g. demo.example.com
+  className: ""      # override GatewayClass name (default: derived from provider)
+  tls:
+    enabled: false
+    secretName: ""
+
+# Infrastructure
+postgres:
+  image: postgres:16-alpine
+  replicas: 1
+  user: otel
+  password: otel
+  resources:
+    limits:
+      memory: 80Mi
+    requests:
+      memory: 40Mi
+
+valkey:
+  image: valkey/valkey:7-alpine
+  replicas: 1
+  resources:
+    limits:
+      memory: 20Mi
+    requests:
+      memory: 10Mi
+
+# Per-service configuration
+images:
+  frontend:
+    repository: otel-demo-light/frontend
+    tag: latest
+    pullPolicy: IfNotPresent
+  productCatalog:
+    repository: otel-demo-light/product-catalog
+    tag: latest
+    pullPolicy: IfNotPresent
+  cart:
+    repository: otel-demo-light/cart
+    tag: latest
+    pullPolicy: IfNotPresent
+  checkout:
+    repository: otel-demo-light/checkout
+    tag: latest
+    pullPolicy: IfNotPresent
+  payment:
+    repository: otel-demo-light/payment
+    tag: latest
+    pullPolicy: IfNotPresent
+  loadGenerator:
+    repository: otel-demo-light/load-generator
+    tag: latest
+    pullPolicy: IfNotPresent
+
+frontend:
+  replicas: 1
+  port: 8080
+  resources:
+    limits:
+      memory: 250Mi
+    requests:
+      memory: 128Mi
+
+productCatalog:
+  replicas: 1
+  port: 3550
+  resources:
+    limits:
+      memory: 20Mi
+    requests:
+      memory: 10Mi
+
+cart:
+  replicas: 1
+  port: 7070
+  jvmOpts: "-Xmx128m"
+  resources:
+    limits:
+      memory: 200Mi
+    requests:
+      memory: 100Mi
+
+checkout:
+  replicas: 1
+  port: 5050
+  resources:
+    limits:
+      memory: 50Mi
+    requests:
+      memory: 25Mi
+
+payment:
+  replicas: 1
+  port: 6060
+  resources:
+    limits:
+      memory: 10Mi
+    requests:
+      memory: 5Mi
+
+loadGenerator:
+  enabled: true
+  replicas: 1
+  port: 8089
+  users: 5
+  spawnRate: 1
+  resources:
+    limits:
+      memory: 300Mi
+    requests:
+      memory: 128Mi

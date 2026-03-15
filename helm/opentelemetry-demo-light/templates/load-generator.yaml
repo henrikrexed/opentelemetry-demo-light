@@ -1,0 +1,51 @@
+{{- if .Values.loadGenerator.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Release.Name }}-load-generator
+  labels:
+    {{- include "otel-demo.labels" . | nindent 4 }}
+spec:
+  type: ClusterIP
+  selector:
+    {{- include "otel-demo.selectorLabels" (dict "name" "load-generator" "root" .) | nindent 4 }}
+  ports:
+    - port: {{ .Values.loadGenerator.port }}
+      targetPort: {{ .Values.loadGenerator.port }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-load-generator
+  labels:
+    {{- include "otel-demo.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.loadGenerator.replicas }}
+  selector:
+    matchLabels:
+      {{- include "otel-demo.selectorLabels" (dict "name" "load-generator" "root" .) | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "otel-demo.selectorLabels" (dict "name" "load-generator" "root" .) | nindent 8 }}
+    spec:
+      containers:
+        - name: load-generator
+          image: {{ include "otel-demo.image" (dict "img" .Values.images.loadGenerator) }}
+          imagePullPolicy: {{ .Values.images.loadGenerator.pullPolicy }}
+          ports:
+            - containerPort: {{ .Values.loadGenerator.port }}
+          env:
+            - name: LOCUST_HOST
+              value: "http://{{ .Release.Name }}-frontend:{{ .Values.frontend.port }}"
+            - name: LOCUST_USERS
+              value: {{ .Values.loadGenerator.users | quote }}
+            - name: LOCUST_SPAWN_RATE
+              value: {{ .Values.loadGenerator.spawnRate | quote }}
+            - name: LOCUST_WEB_PORT
+              value: {{ .Values.loadGenerator.port | quote }}
+            - name: LOCUST_AUTOSTART
+              value: "true"
+          resources:
+            {{- toYaml .Values.loadGenerator.resources | nindent 12 }}
+{{- end }}
