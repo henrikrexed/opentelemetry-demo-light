@@ -1,11 +1,9 @@
-FROM golang:1.24-alpine AS builder
-
-ENV GOTOOLCHAIN=auto
+FROM golang:1.22-alpine AS builder
 
 RUN apk add --no-cache git gcc musl-dev
-RUN go install go.k6.io/xk6/cmd/xk6@latest
+RUN go install go.k6.io/xk6/cmd/xk6@v0.13.0
 
-RUN xk6 build   --with github.com/grafana/xk6-output-opentelemetry@latest
+RUN xk6 build v0.53.0   --with github.com/grafana/xk6-output-opentelemetry@latest
 
 FROM alpine:3.19
 
