@@ -4,7 +4,7 @@ RUN apk add --no-cache git
 RUN go install go.k6.io/xk6/cmd/xk6@latest
 
 RUN xk6 build v1.6.1 \
-  --with github.com/henrikrexed/xk6-output-opentelemetry@latest
+  --with github.com/henrikrexed/henrikrexed-xk6-output-opentelemetry@latest
 
 FROM alpine:3.19
 

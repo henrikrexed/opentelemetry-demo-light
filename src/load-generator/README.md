@@ -4,7 +4,7 @@
 
 | | |
 |---|---|
-| **Tool** | [k6](https://k6.io/) with [xk6-output-opentelemetry](https://github.com/grafana/xk6-output-opentelemetry) |
+| **Tool** | [k6](https://k6.io/) with [xk6-output-opentelemetry](https://github.com/henrikrexed/henrikrexed-xk6-output-opentelemetry) |
 | **Language** | JavaScript (k6 runtime) |
 | **OTel Integration** | Native OTLP export via `--out experimental-opentelemetry` |
 | **Source** | `src/load-generator/` |
