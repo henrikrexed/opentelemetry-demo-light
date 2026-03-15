@@ -132,11 +132,11 @@ epics:
 
   - id: epic-8
     name: "DevContainer and Codespaces"
-    status: backlog
+    status: done
     stories:
       - id: "8.1"
         name: "DevContainer Configuration"
-        status: backlog
+        status: done
 
   - id: epic-9
     name: "Kubernetes Manifests"
