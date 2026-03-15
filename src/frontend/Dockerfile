@@ -6,6 +6,7 @@ COPY package.json package-lock.json ./
 RUN npm ci
 
 COPY . .
+RUN mkdir -p public
 RUN npm run build
 
 FROM node:20-alpine
@@ -20,9 +21,7 @@ COPY --from=builder /app/proto ./proto
 COPY --from=builder /app/instrumentation.js ./instrumentation.js
 
 # grpc_health_probe for health checks
-RUN wget -qO/app/grpc_health_probe \
-    https://github.com/grpc-ecosystem/grpc-health-probe/releases/download/v0.4.25/grpc_health_probe-linux-amd64 && \
-    chmod +x /app/grpc_health_probe
+RUN wget -qO/app/grpc_health_probe     https://github.com/grpc-ecosystem/grpc-health-probe/releases/download/v0.4.25/grpc_health_probe-linux-amd64 &&     chmod +x /app/grpc_health_probe
 
 ENV PORT=8080
 ENV HOSTNAME="0.0.0.0"
