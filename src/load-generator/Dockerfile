@@ -1,6 +1,7 @@
-FROM golang:1.24-alpine AS builder
+FROM golang:1.25-alpine AS builder
 
-RUN apk add --no-cache git
+ENV GOTOOLCHAIN=auto
+RUN apk add --no-cache git gcc musl-dev
 RUN go install go.k6.io/xk6/cmd/xk6@latest
 
 RUN xk6 build v1.6.1 \
@@ -8,7 +9,7 @@ RUN xk6 build v1.6.1 \
 
 FROM alpine:3.19
 
-COPY --from=builder /xk6/k6 /usr/bin/k6
+COPY --from=builder /go/k6 /usr/bin/k6
 COPY test.js /scripts/test.js
 COPY run.sh /scripts/run.sh
 
