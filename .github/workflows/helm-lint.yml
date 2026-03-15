@@ -1,0 +1,66 @@
+name: Helm — Lint & Template
+
+on:
+  pull_request:
+    paths:
+      - "helm/**"
+
+permissions:
+  contents: read
+
+jobs:
+  helm-lint:
+    name: Lint & Template
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Helm
+        uses: azure/setup-helm@v4
+
+      - name: Lint chart
+        run: helm lint helm/opentelemetry-demo-light/
+
+      - name: Template with defaults
+        run: helm template demo helm/opentelemetry-demo-light/ > /dev/null
+
+      - name: Template with collector disabled
+        run: |
+          helm template demo helm/opentelemetry-demo-light/ \
+            --set collector.enabled=false \
+            --set otlp.endpoint=https://external:4317 \
+            > /dev/null
+
+      - name: Template with gateway enabled
+        run: |
+          helm template demo helm/opentelemetry-demo-light/ \
+            --set gateway.enabled=true \
+            --set gateway.provider=istio \
+            --set gateway.hostname=demo.example.com \
+            > /dev/null
+
+      - name: Template with delta metrics
+        run: |
+          helm template demo helm/opentelemetry-demo-light/ \
+            --set metrics.aggregation=delta \
+            > /dev/null
+
+      - name: Verify no collector when disabled
+        run: |
+          OUTPUT=$(helm template demo helm/opentelemetry-demo-light/ --set collector.enabled=false)
+          if echo "$OUTPUT" | grep -q "kind: Deployment" | grep -q "otel-collector"; then
+            echo "ERROR: Collector deployment found when collector.enabled=false"
+            exit 1
+          fi
+          echo "OK: No collector deployment when disabled"
+
+      - name: Verify OTLP endpoint override
+        run: |
+          OUTPUT=$(helm template demo helm/opentelemetry-demo-light/ \
+            --set collector.enabled=false \
+            --set otlp.endpoint=https://custom:4317)
+          if ! echo "$OUTPUT" | grep -q "https://custom:4317"; then
+            echo "ERROR: Custom OTLP endpoint not found in output"
+            exit 1
+          fi
+          echo "OK: Custom OTLP endpoint correctly propagated"
