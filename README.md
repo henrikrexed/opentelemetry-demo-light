@@ -218,20 +218,22 @@ kubectl apply -k kubernetes/
 
 ### Helm Chart
 
+Install directly from OCI registry (no repo add needed):
+
 ```bash
-helm install demo helm/opentelemetry-demo-light/
+helm install demo oci://ghcr.io/henrikrexed/opentelemetry-demo-light --version 0.1.0
 
 # BYOB mode (no collector, send directly to your backend)
-helm install demo helm/opentelemetry-demo-light/ \
+helm install demo oci://ghcr.io/henrikrexed/opentelemetry-demo-light --version 0.1.0 \
   --set collector.enabled=false \
   --set otlp.endpoint=https://your-backend:4317
 
 # Delta metrics aggregation
-helm install demo helm/opentelemetry-demo-light/ \
+helm install demo oci://ghcr.io/henrikrexed/opentelemetry-demo-light --version 0.1.0 \
   --set metrics.aggregation=delta
 
 # Expose via Gateway API (e.g. Istio)
-helm install demo helm/opentelemetry-demo-light/ \
+helm install demo oci://ghcr.io/henrikrexed/opentelemetry-demo-light --version 0.1.0 \
   --set gateway.enabled=true \
   --set gateway.provider=istio \
   --set gateway.hostname=demo.example.com

@@ -4,8 +4,9 @@ use opentelemetry::global;
 use opentelemetry::metrics::Counter;
 use opentelemetry::trace::{Span, SpanKind, Status, Tracer};
 use opentelemetry::KeyValue;
-use opentelemetry_otlp::WithExportConfig;
+use opentelemetry_otlp::{MetricExporter, SpanExporter, WithExportConfig};
 use opentelemetry_sdk::metrics::SdkMeterProvider;
+use opentelemetry_sdk::trace::TracerProvider;
 use opentelemetry_sdk::Resource;
 use tonic::{transport::Server, Request, Response};
 use uuid::Uuid;
@@ -29,11 +30,11 @@ impl PaymentServiceImpl {
         let payments_counter = meter
             .u64_counter("app.payment.processed.total")
             .with_description("Total number of payments processed")
-            .init();
+            .build();
         let amount_counter = meter
             .u64_counter("app.payment.amount.sum")
             .with_description("Total USD cents processed")
-            .init();
+            .build();
 
         Self {
             tracer,
@@ -51,7 +52,6 @@ impl PaymentService for PaymentServiceImpl {
     ) -> Result<Response<ProcessPaymentResponse>, tonic::Status> {
         let req = request.into_inner();
 
-        // payment.process span
         let mut process_span = self
             .tracer
             .span_builder("payment.process")
@@ -69,10 +69,7 @@ impl PaymentService for PaymentServiceImpl {
             card_number
         };
 
-        process_span.set_attribute(KeyValue::new(
-            "app.payment.amount_cents",
-            amount_cents,
-        ));
+        process_span.set_attribute(KeyValue::new("app.payment.amount_cents", amount_cents));
         process_span.set_attribute(KeyValue::new(
             "app.payment.card_last_four",
             card_last_four.to_string(),
@@ -148,10 +145,8 @@ impl PaymentService for PaymentServiceImpl {
         process_span.set_status(Status::Ok);
         process_span.end();
 
-        // Record metrics
         self.payments_counter.add(1, &[]);
-        self.amount_counter
-            .add(amount_cents as u64, &[]);
+        self.amount_counter.add(amount_cents as u64, &[]);
 
         tracing::info!(
             transaction_id = %transaction_id,
@@ -166,62 +161,55 @@ impl PaymentService for PaymentServiceImpl {
     }
 }
 
-fn init_tracer() -> opentelemetry_sdk::trace::Tracer {
+fn build_resource() -> Resource {
+    let service_name = env::var("OTEL_SERVICE_NAME").unwrap_or_else(|_| "payment".into());
+    Resource::builder()
+        .with_service_name(service_name)
+        .build()
+}
+
+fn init_tracer_provider() -> TracerProvider {
     let endpoint =
         env::var("OTEL_EXPORTER_OTLP_ENDPOINT").unwrap_or_else(|_| "http://localhost:4317".into());
 
-    let exporter = opentelemetry_otlp::new_exporter()
-        .tonic()
-        .with_endpoint(&endpoint);
+    let exporter = SpanExporter::builder()
+        .with_tonic()
+        .with_endpoint(&endpoint)
+        .build()
+        .expect("failed to create OTLP span exporter");
 
-    let service_name =
-        env::var("OTEL_SERVICE_NAME").unwrap_or_else(|_| "payment".into());
-
-    let resource = Resource::new(vec![KeyValue::new(
-        "service.name",
-        service_name,
-    )]);
-
-    opentelemetry_otlp::new_pipeline()
-        .tracing()
-        .with_exporter(exporter)
-        .with_trace_config(
-            opentelemetry_sdk::trace::Config::default().with_resource(resource),
-        )
-        .install_batch(opentelemetry_sdk::runtime::Tokio)
-        .expect("failed to install OTLP trace pipeline")
+    TracerProvider::builder()
+        .with_resource(build_resource())
+        .with_batch_exporter(exporter)
+        .build()
 }
 
 fn init_meter_provider() -> SdkMeterProvider {
     let endpoint =
         env::var("OTEL_EXPORTER_OTLP_ENDPOINT").unwrap_or_else(|_| "http://localhost:4317".into());
 
-    let exporter = opentelemetry_otlp::new_exporter()
-        .tonic()
-        .with_endpoint(&endpoint);
-
-    let service_name =
-        env::var("OTEL_SERVICE_NAME").unwrap_or_else(|_| "payment".into());
-
-    let resource = Resource::new(vec![KeyValue::new(
-        "service.name",
-        service_name,
-    )]);
-
-    opentelemetry_otlp::new_pipeline()
-        .metrics(opentelemetry_sdk::runtime::Tokio)
-        .with_exporter(exporter)
-        .with_resource(resource)
+    let exporter = MetricExporter::builder()
+        .with_tonic()
+        .with_endpoint(&endpoint)
         .build()
-        .expect("failed to install OTLP metrics pipeline")
+        .expect("failed to create OTLP metric exporter");
+
+    let reader = opentelemetry_sdk::metrics::PeriodicReader::builder(exporter)
+        .build();
+
+    SdkMeterProvider::builder()
+        .with_resource(build_resource())
+        .with_reader(reader)
+        .build()
 }
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    // Initialize tracing subscriber
     tracing_subscriber::fmt::init();
 
-    let tracer = init_tracer();
+    let tracer_provider = init_tracer_provider();
+    let tracer = tracer_provider.tracer("payment");
+    global::set_tracer_provider(tracer_provider);
 
     let meter_provider = init_meter_provider();
     global::set_meter_provider(meter_provider);
@@ -251,11 +239,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use opentelemetry::trace::TracerProvider as _;
     use oteldemo::{CreditCardInfo, Money};
 
     fn test_tracer() -> opentelemetry_sdk::trace::Tracer {
-        let provider = opentelemetry_sdk::trace::TracerProvider::builder().build();
+        let provider = TracerProvider::builder().build();
         provider.tracer("test")
     }
 
@@ -279,7 +266,6 @@ mod tests {
         let inner = resp.into_inner();
         assert!(inner.success);
         assert!(!inner.transaction_id.is_empty());
-        // Verify transaction_id is a valid UUID
         assert!(Uuid::parse_str(&inner.transaction_id).is_ok());
     }
 
@@ -367,7 +353,6 @@ mod tests {
     async fn test_card_last_four() {
         let svc = PaymentServiceImpl::new(test_tracer());
         let resp = svc.process_payment(valid_request()).await.unwrap();
-        // Just verify it succeeds — the card_last_four is set as a span attribute
         assert!(resp.into_inner().success);
     }
 }

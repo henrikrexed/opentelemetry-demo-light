@@ -8,21 +8,21 @@ name = "payment"
 path = "src/main.rs"
 
 [dependencies]
-tonic = "0.11"
-prost = "0.12"
+tonic = "0.12"
+prost = "0.13"
 tokio = { version = "1", features = ["full"] }
 uuid = { version = "1", features = ["v4"] }
 
 # OTel
-opentelemetry = { version = "0.22", features = ["metrics"] }
-opentelemetry_sdk = { version = "0.22", features = ["rt-tokio", "metrics"] }
-opentelemetry-otlp = { version = "0.15", features = ["tonic", "metrics"] }
+opentelemetry = { version = "0.28", features = ["metrics"] }
+opentelemetry_sdk = { version = "0.28", features = ["rt-tokio", "metrics"] }
+opentelemetry-otlp = { version = "0.28", features = ["tonic", "metrics"] }
 tracing = "0.1"
-tracing-opentelemetry = "0.23"
+tracing-opentelemetry = "0.29"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 
 # gRPC health check
-tonic-health = "0.11"
+tonic-health = "0.12"
 
 [build-dependencies]
-tonic-build = "0.11"
+tonic-build = "0.12"
