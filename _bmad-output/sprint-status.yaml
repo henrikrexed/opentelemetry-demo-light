@@ -121,14 +121,14 @@ epics:
 
   - id: epic-7
     name: "Load Generator"
-    status: backlog
+    status: done
     stories:
       - id: "7.1"
         name: "User Journey Simulation"
-        status: backlog
+        status: done
       - id: "7.2"
         name: "Locust Dockerfile and Web UI"
-        status: backlog
+        status: done
 
   - id: epic-8
     name: "DevContainer and Codespaces"
