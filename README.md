@@ -239,6 +239,9 @@ helm install demo helm/opentelemetry-demo-light/ \
 
 ## Documentation
 
+📖 **[Full Documentation](https://henrikrexed.github.io/opentelemetry-demo-light/)** — Architecture, getting started, per-service instrumentation guides
+
+
 Full docs (architecture, getting started, per-service instrumentation guides): run locally with MkDocs:
 
 ```bash
