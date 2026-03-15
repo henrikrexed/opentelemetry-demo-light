@@ -1,3 +1,4 @@
+setuptools
 grpcio==1.72.0
 grpcio-tools==1.72.0
 grpcio-health-checking==1.72.0
