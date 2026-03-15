@@ -1,0 +1,84 @@
+plugins {
+    id 'java'
+    id 'application'
+    id 'com.google.protobuf' version '0.9.4'
+}
+
+group = 'io.opentelemetry.demo'
+version = '1.0.0'
+sourceCompatibility = '17'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // gRPC
+    implementation 'io.grpc:grpc-netty-shaded:1.62.2'
+    implementation 'io.grpc:grpc-protobuf:1.62.2'
+    implementation 'io.grpc:grpc-stub:1.62.2'
+    implementation 'io.grpc:grpc-services:1.62.2'
+
+    // Protobuf
+    implementation 'com.google.protobuf:protobuf-java:3.25.3'
+
+    // Redis/Valkey client
+    implementation 'redis.clients:jedis:5.1.2'
+
+    // JSON serialization for cart storage
+    implementation 'com.google.code.gson:gson:2.10.1'
+
+    // OTel API for custom metrics only (no manual instrumentation in business logic)
+    implementation 'io.opentelemetry:opentelemetry-api:1.36.0'
+
+    // Required for protobuf generated code
+    compileOnly 'org.apache.tomcat:annotations-api:6.0.53'
+
+    // Testing
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.10.2'
+    testImplementation 'org.mockito:mockito-core:5.11.0'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+protobuf {
+    protoc {
+        artifact = 'com.google.protobuf:protoc:3.25.3'
+    }
+    plugins {
+        grpc {
+            artifact = 'io.grpc:protoc-gen-grpc-java:1.62.2'
+        }
+    }
+    generateProtoTasks {
+        all()*.plugins {
+            grpc {}
+        }
+    }
+}
+
+application {
+    mainClass = 'io.opentelemetry.demo.cart.CartApplication'
+}
+
+jar {
+    manifest {
+        attributes 'Main-Class': 'io.opentelemetry.demo.cart.CartApplication'
+    }
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
+
+// Fat JAR for Docker
+tasks.register('fatJar', Jar) {
+    archiveClassifier = 'all'
+    manifest {
+        attributes 'Main-Class': 'io.opentelemetry.demo.cart.CartApplication'
+    }
+    from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+    with jar
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}

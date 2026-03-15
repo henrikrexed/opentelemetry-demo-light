@@ -1,0 +1,269 @@
+x-default-logging: &default-logging
+  driver: json-file
+  options:
+    max-size: "5m"
+    max-file: "2"
+
+networks:
+  demo:
+    driver: bridge
+
+services:
+  # ---------------------------------------------------------------------------
+  # Infrastructure
+  # ---------------------------------------------------------------------------
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-otel}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-otel}
+    volumes:
+      - ./src/postgres/init:/docker-entrypoint-initdb.d
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    networks:
+      - demo
+    mem_limit: 80m
+    logging: *default-logging
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-otel}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  valkey:
+    image: valkey/valkey:7-alpine
+    container_name: valkey
+    command: ["valkey-server", "--save", "", "--appendonly", "no", "--maxmemory", "16mb", "--maxmemory-policy", "allkeys-lru"]
+    ports:
+      - "${VALKEY_PORT:-6379}:6379"
+    networks:
+      - demo
+    mem_limit: 20m
+    logging: *default-logging
+    healthcheck:
+      test: ["CMD", "valkey-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.98.0
+    container_name: otel-collector
+    command: ["--config=/etc/otelcol/config.yaml"]
+    volumes:
+      - ./otel-collector-config.yaml:/etc/otelcol/config.yaml:ro
+    ports:
+      - "4317:4317"   # OTLP gRPC
+      - "4318:4318"   # OTLP HTTP
+      - "13133:13133" # Health check
+    networks:
+      - demo
+    mem_limit: 100m
+    logging: *default-logging
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:13133"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # ---------------------------------------------------------------------------
+  # Application Services
+  # ---------------------------------------------------------------------------
+
+  product-catalog:
+    build:
+      context: ./src/product-catalog
+      dockerfile: Dockerfile
+    container_name: product-catalog
+    environment:
+      OTEL_SERVICE_NAME: product-catalog
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4317
+      POSTGRES_HOST: ${POSTGRES_HOST:-postgres}
+      POSTGRES_PORT: "5432"
+      POSTGRES_USER: ${POSTGRES_USER:-otel}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-otel}
+      POSTGRES_DB: product_catalog
+    ports:
+      - "3550:3550"
+    networks:
+      - demo
+    mem_limit: 20m
+    logging: *default-logging
+    depends_on:
+      postgres:
+        condition: service_healthy
+      otel-collector:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "/app/grpc_health_probe", "-addr=:3550"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  cart:
+    build:
+      context: ./src/cart
+      dockerfile: Dockerfile
+    container_name: cart
+    environment:
+      OTEL_SERVICE_NAME: cart
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4317
+      VALKEY_ADDR: ${VALKEY_ADDR:-valkey:6379}
+    ports:
+      - "7070:7070"
+    networks:
+      - demo
+    mem_limit: 200m
+    logging: *default-logging
+    depends_on:
+      valkey:
+        condition: service_healthy
+      otel-collector:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "/app/grpc_health_probe", "-addr=localhost:7070"]
+      interval: 5s
+      timeout: 10s
+      retries: 5
+
+  checkout:
+    build:
+      context: ./src/checkout
+      dockerfile: Dockerfile
+    container_name: checkout
+    environment:
+      OTEL_SERVICE_NAME: checkout
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4317
+      CART_ADDR: ${CART_ADDR:-cart:7070}
+      PRODUCT_CATALOG_ADDR: ${PRODUCT_CATALOG_ADDR:-product-catalog:3550}
+      PAYMENT_ADDR: ${PAYMENT_ADDR:-payment:6060}
+      POSTGRES_HOST: ${POSTGRES_HOST:-postgres}
+      POSTGRES_PORT: "5432"
+      POSTGRES_USER: ${POSTGRES_USER:-otel}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-otel}
+      POSTGRES_DB: checkout_orders
+    ports:
+      - "5050:5050"
+    networks:
+      - demo
+    mem_limit: 50m
+    logging: *default-logging
+    depends_on:
+      cart:
+        condition: service_healthy
+      product-catalog:
+        condition: service_healthy
+      payment:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+      otel-collector:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "/app/grpc_health_probe", "-addr=localhost:5050"]
+      interval: 5s
+      timeout: 10s
+      retries: 5
+
+  payment:
+    build:
+      context: ./src/payment
+      dockerfile: Dockerfile
+    container_name: payment
+    environment:
+      OTEL_SERVICE_NAME: payment
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4317
+    ports:
+      - "6060:6060"
+    networks:
+      - demo
+    mem_limit: 10m
+    logging: *default-logging
+    depends_on:
+      otel-collector:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "/app/grpc_health_probe", "-addr=:6060"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  frontend:
+    build:
+      context: ./src/frontend
+      dockerfile: Dockerfile
+    container_name: frontend
+    environment:
+      OTEL_SERVICE_NAME: frontend
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4317
+      PRODUCT_CATALOG_ADDR: ${PRODUCT_CATALOG_ADDR:-product-catalog:3550}
+      CART_ADDR: ${CART_ADDR:-cart:7070}
+      CHECKOUT_ADDR: ${CHECKOUT_ADDR:-checkout:5050}
+      PORT: "8080"
+    ports:
+      - "8080:8080"
+    networks:
+      - demo
+    mem_limit: 250m
+    logging: *default-logging
+    depends_on:
+      product-catalog:
+        condition: service_healthy
+      cart:
+        condition: service_healthy
+      checkout:
+        condition: service_healthy
+      otel-collector:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:8080"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # ---------------------------------------------------------------------------
+  # Load Generator
+  # ---------------------------------------------------------------------------
+
+  load-generator:
+    build:
+      context: ./src/load-generator
+      dockerfile: Dockerfile
+    container_name: load-generator
+    environment:
+      LOCUST_HOST: http://frontend:8080
+      LOCUST_USERS: ${LOCUST_USERS:-5}
+      LOCUST_SPAWN_RATE: ${LOCUST_SPAWN_RATE:-1}
+      LOCUST_WEB_PORT: "8089"
+      OTEL_SERVICE_NAME: load-generator
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4317
+    ports:
+      - "8089:8089"
+    networks:
+      - demo
+    mem_limit: 300m
+    logging: *default-logging
+    depends_on:
+      frontend:
+        condition: service_healthy
+
+  # ---------------------------------------------------------------------------
+  # Optional: Jaeger (use with --profile jaeger)
+  # ---------------------------------------------------------------------------
+
+  jaeger:
+    image: jaegertracing/all-in-one:1.56
+    container_name: jaeger
+    environment:
+      COLLECTOR_OTLP_ENABLED: "true"
+    ports:
+      - "16686:16686" # Jaeger UI
+    networks:
+      - demo
+    mem_limit: 300m
+    logging: *default-logging
+    profiles:
+      - jaeger

@@ -1,0 +1,161 @@
+sprint: "Sprint 1 - Scaffolding & Infrastructure"
+updated: "2026-03-14"
+
+epics:
+  - id: epic-1
+    name: "Project Scaffolding and Infrastructure"
+    status: done
+    stories:
+      - id: "1.1"
+        name: "Repository Structure and Build System"
+        status: done
+      - id: "1.2"
+        name: "Proto Definitions"
+        status: done
+      - id: "1.3"
+        name: "Docker Compose Configuration"
+        status: done
+      - id: "1.4"
+        name: "PostgreSQL Setup"
+        status: done
+      - id: "1.5"
+        name: "Valkey Setup"
+        status: done
+      - id: "1.6"
+        name: "OTel Collector Configuration"
+        status: done
+
+  - id: epic-2
+    name: "Product Catalog Service (Go)"
+    status: done
+    stories:
+      - id: "2.1"
+        name: "gRPC Server and Endpoints"
+        status: done
+      - id: "2.2"
+        name: "Dockerfile and Build"
+        status: done
+      - id: "2.3"
+        name: "Manual OTel Instrumentation"
+        status: done
+      - id: "2.4"
+        name: "Baggage Propagation"
+        status: done
+
+  - id: epic-3
+    name: "Cart Service (Java)"
+    status: done
+    stories:
+      - id: "3.1"
+        name: "gRPC Server and Endpoints"
+        status: done
+      - id: "3.2"
+        name: "Dockerfile and Build"
+        status: done
+      - id: "3.3"
+        name: "Java Agent Auto-Instrumentation"
+        status: done
+      - id: "3.4"
+        name: "Custom Metrics"
+        status: done
+
+  - id: epic-4
+    name: "Payment Service (Rust)"
+    status: backlog
+    stories:
+      - id: "4.1"
+        name: "gRPC Server and Endpoint"
+        status: backlog
+      - id: "4.2"
+        name: "Dockerfile and Build"
+        status: backlog
+      - id: "4.3"
+        name: "Manual OTel Instrumentation (Rust)"
+        status: backlog
+      - id: "4.4"
+        name: "Custom Metrics"
+        status: backlog
+
+  - id: epic-5
+    name: "Checkout Service (Python)"
+    status: backlog
+    stories:
+      - id: "5.1"
+        name: "gRPC Server and PlaceOrder Endpoint"
+        status: backlog
+      - id: "5.2"
+        name: "Dockerfile and Build"
+        status: backlog
+      - id: "5.3"
+        name: "Python Auto + Manual Instrumentation"
+        status: backlog
+      - id: "5.4"
+        name: "Context Propagation"
+        status: backlog
+      - id: "5.5"
+        name: "Structured Logging with Trace Correlation"
+        status: backlog
+
+  - id: epic-6
+    name: "Frontend Service (Node.js / Next.js)"
+    status: backlog
+    stories:
+      - id: "6.1"
+        name: "Remove Envoy Proxy Dependency"
+        status: backlog
+      - id: "6.2"
+        name: "Product Pages (Listing + Detail)"
+        status: backlog
+      - id: "6.3"
+        name: "Cart Page"
+        status: backlog
+      - id: "6.4"
+        name: "Checkout Flow"
+        status: backlog
+      - id: "6.5"
+        name: "Server-Side OTel Auto-Instrumentation"
+        status: backlog
+      - id: "6.6"
+        name: "Browser SDK Telemetry"
+        status: backlog
+
+  - id: epic-7
+    name: "Load Generator"
+    status: backlog
+    stories:
+      - id: "7.1"
+        name: "User Journey Simulation"
+        status: backlog
+      - id: "7.2"
+        name: "Locust Dockerfile and Web UI"
+        status: backlog
+
+  - id: epic-8
+    name: "DevContainer and Codespaces"
+    status: backlog
+    stories:
+      - id: "8.1"
+        name: "DevContainer Configuration"
+        status: backlog
+
+  - id: epic-9
+    name: "Kubernetes Manifests"
+    status: backlog
+    stories:
+      - id: "9.1"
+        name: "Kubernetes Deployment Manifests"
+        status: backlog
+
+  - id: epic-10
+    name: "Documentation"
+    status: backlog
+    stories:
+      - id: "10.1"
+        name: "Root README"
+        status: backlog
+      - id: "10.2"
+        name: "BYOB Backend Guides"
+        status: backlog
+      - id: "10.3"
+        name: "Per-Service READMEs"
+        status: backlog

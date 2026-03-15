@@ -1,0 +1,48 @@
+# Environment
+.env
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Node.js (Frontend)
+src/frontend/node_modules/
+src/frontend/.next/
+src/frontend/out/
+
+# Go (Product Catalog)
+src/product-catalog/product-catalog
+src/product-catalog/vendor/
+
+# Java (Cart)
+src/cart/.gradle/
+src/cart/build/
+src/cart/bin/
+src/cart/*.jar
+
+# Python (Checkout, Load Generator)
+src/checkout/__pycache__/
+src/checkout/*.pyc
+src/checkout/.venv/
+src/load-generator/__pycache__/
+src/load-generator/*.pyc
+src/load-generator/.venv/
+
+# Rust (Payment)
+src/payment/target/
+
+# Proto generated code
+src/*/generated/
+src/**/pb/
+src/**/*_pb2.py
+src/**/*_pb2_grpc.py
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Docker
+docker-compose.override.yaml

@@ -1,0 +1,153 @@
+// Copyright 2024 OpenTelemetry Demo Light Authors
+// SPDX-License-Identifier: Apache-2.0
+//
+// Derived from the opentelemetry-demo project, pruned to 5 services.
+
+syntax = "proto3";
+
+package oteldemo;
+
+option go_package = "github.com/opentelemetry-demo-light/genproto/oteldemo";
+option java_multiple_files = true;
+option java_package = "io.opentelemetry.demo";
+
+// --------------------------------------------------------------------------
+// Common types
+// --------------------------------------------------------------------------
+
+message Empty {}
+
+message Money {
+  int64 amount_cents = 1; // Price in USD cents
+}
+
+message Address {
+  string street_address = 1;
+  string city = 2;
+  string state = 3;
+  string zip_code = 4;
+  string country = 5;
+}
+
+message CreditCardInfo {
+  string credit_card_number = 1;
+  int32 credit_card_cvv = 2;
+  int32 credit_card_expiration_year = 3;
+  int32 credit_card_expiration_month = 4;
+}
+
+// --------------------------------------------------------------------------
+// ProductCatalogService
+// --------------------------------------------------------------------------
+
+service ProductCatalogService {
+  rpc ListProducts(Empty) returns (ListProductsResponse) {}
+  rpc GetProduct(GetProductRequest) returns (Product) {}
+  rpc SearchProducts(SearchProductsRequest) returns (SearchProductsResponse) {}
+}
+
+message Product {
+  string id = 1;
+  string name = 2;
+  string description = 3;
+  string picture = 4;
+  Money price_usd = 5;
+  repeated string categories = 6;
+}
+
+message ListProductsResponse {
+  repeated Product products = 1;
+}
+
+message GetProductRequest {
+  string id = 1;
+}
+
+message SearchProductsRequest {
+  string query = 1;
+}
+
+message SearchProductsResponse {
+  repeated Product results = 1;
+}
+
+// --------------------------------------------------------------------------
+// CartService
+// --------------------------------------------------------------------------
+
+service CartService {
+  rpc AddItem(AddItemRequest) returns (Empty) {}
+  rpc GetCart(GetCartRequest) returns (Cart) {}
+  rpc EmptyCart(EmptyCartRequest) returns (Empty) {}
+}
+
+message CartItem {
+  string product_id = 1;
+  int32 quantity = 2;
+}
+
+message AddItemRequest {
+  string user_id = 1;
+  CartItem item = 2;
+}
+
+message GetCartRequest {
+  string user_id = 1;
+}
+
+message Cart {
+  string user_id = 1;
+  repeated CartItem items = 2;
+}
+
+message EmptyCartRequest {
+  string user_id = 1;
+}
+
+// --------------------------------------------------------------------------
+// CheckoutService
+// --------------------------------------------------------------------------
+
+service CheckoutService {
+  rpc PlaceOrder(PlaceOrderRequest) returns (PlaceOrderResponse) {}
+}
+
+message PlaceOrderRequest {
+  string user_id = 1;
+  string user_email = 2;
+  Address address = 3;
+  CreditCardInfo credit_card = 4;
+}
+
+message PlaceOrderResponse {
+  string order_id = 1;
+  string shipping_tracking_id = 2;
+  Money shipping_cost = 3;
+  Money total_cost = 4;
+  repeated OrderItem items = 5;
+  string transaction_id = 6;
+}
+
+message OrderItem {
+  CartItem item = 1;
+  Money cost = 2;
+}
+
+// --------------------------------------------------------------------------
+// PaymentService
+// --------------------------------------------------------------------------
+
+service PaymentService {
+  rpc ProcessPayment(ProcessPaymentRequest) returns (ProcessPaymentResponse) {}
+}
+
+message ProcessPaymentRequest {
+  Money amount = 1;
+  CreditCardInfo credit_card = 2;
+  string order_id = 3;
+}
+
+message ProcessPaymentResponse {
+  string transaction_id = 1;
+  bool success = 2;
+}
