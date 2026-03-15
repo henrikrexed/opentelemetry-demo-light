@@ -1,4 +1,6 @@
-FROM golang:1.23-alpine AS builder
+FROM golang:1.24-alpine AS builder
+
+ENV GOTOOLCHAIN=auto
 
 RUN apk add --no-cache git gcc musl-dev
 RUN go install go.k6.io/xk6/cmd/xk6@latest
