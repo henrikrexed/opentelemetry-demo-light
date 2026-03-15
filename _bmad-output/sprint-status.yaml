@@ -98,26 +98,26 @@ epics:
 
   - id: epic-6
     name: "Frontend Service (Node.js / Next.js)"
-    status: backlog
+    status: done
     stories:
       - id: "6.1"
         name: "Remove Envoy Proxy Dependency"
-        status: backlog
+        status: done
       - id: "6.2"
         name: "Product Pages (Listing + Detail)"
-        status: backlog
+        status: done
       - id: "6.3"
         name: "Cart Page"
-        status: backlog
+        status: done
       - id: "6.4"
         name: "Checkout Flow"
-        status: backlog
+        status: done
       - id: "6.5"
         name: "Server-Side OTel Auto-Instrumentation"
-        status: backlog
+        status: done
       - id: "6.6"
         name: "Browser SDK Telemetry"
-        status: backlog
+        status: done
 
   - id: epic-7
     name: "Load Generator"
