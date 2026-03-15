@@ -140,11 +140,11 @@ epics:
 
   - id: epic-9
     name: "Kubernetes Manifests"
-    status: backlog
+    status: done
     stories:
       - id: "9.1"
         name: "Kubernetes Deployment Manifests"
-        status: backlog
+        status: done
 
   - id: epic-10
     name: "Documentation"

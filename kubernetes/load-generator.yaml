@@ -1,0 +1,49 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: load-generator
+spec:
+  type: NodePort
+  selector:
+    app: load-generator
+  ports:
+    - port: 8089
+      targetPort: 8089
+      nodePort: 30089
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: load-generator
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: load-generator
+  template:
+    metadata:
+      labels:
+        app: load-generator
+    spec:
+      containers:
+        - name: load-generator
+          image: otel-demo-light/load-generator:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8089
+          env:
+            - name: LOCUST_HOST
+              value: http://frontend:8080
+            - name: LOCUST_USERS
+              value: "5"
+            - name: LOCUST_SPAWN_RATE
+              value: "1"
+            - name: LOCUST_WEB_PORT
+              value: "8089"
+            - name: LOCUST_AUTOSTART
+              value: "true"
+          resources:
+            limits:
+              memory: 300Mi
+            requests:
+              memory: 128Mi
