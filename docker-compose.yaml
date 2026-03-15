@@ -234,17 +234,15 @@ services:
       dockerfile: Dockerfile
     container_name: load-generator
     environment:
-      LOCUST_HOST: http://frontend:8080
-      LOCUST_USERS: ${LOCUST_USERS:-5}
-      LOCUST_SPAWN_RATE: ${LOCUST_SPAWN_RATE:-1}
-      LOCUST_WEB_PORT: "8089"
+      FRONTEND_URL: http://frontend:8080
+      K6_VUS: ${K6_VUS:-5}
+      K6_DURATION: ${K6_DURATION:-0}
+      K6_OTEL_GRPC_EXPORTER_INSECURE: "true"
+      K6_OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4317
       OTEL_SERVICE_NAME: load-generator
-      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4317
-    ports:
-      - "8089:8089"
     networks:
       - demo
-    mem_limit: 300m
+    mem_limit: 128m
     logging: *default-logging
     depends_on:
       frontend:

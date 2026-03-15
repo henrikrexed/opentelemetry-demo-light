@@ -20,8 +20,13 @@ All 9 containers start in dependency order. The full stack is healthy in about 6
 | Service | URL | Description |
 |---------|-----|-------------|
 | Storefront | [http://localhost:8080](http://localhost:8080) | Browse, add to cart, checkout |
-| Locust UI | [http://localhost:8089](http://localhost:8089) | Load generator dashboard |
 | Collector OTLP | `localhost:4317` (gRPC), `localhost:4318` (HTTP) | Send/receive telemetry |
+
+k6 load generator runs headless. View its output:
+
+```bash
+docker compose logs -f load-generator
+```
 
 ## View Telemetry
 

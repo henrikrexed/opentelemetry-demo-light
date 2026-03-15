@@ -16,7 +16,7 @@ graph TB
     VK[("Valkey")]
     Collector["OTel Collector<br/>:4317 / :4318"]
     Backend["📊 Your Backend<br/><i>Jaeger, Grafana, Dynatrace...</i>"]
-    LG["Load Generator<br/><b>Locust</b> :8089"]
+    LG["Load Generator<br/><b>k6 + OTel</b>"]
 
     Browser -->|HTTP| Frontend
     Frontend -->|gRPC| PC
@@ -124,8 +124,8 @@ docker compose up -d
 # 3. Open the storefront
 open http://localhost:8080
 
-# 4. View Locust load generator UI
-open http://localhost:8089
+# 4. View k6 load generator output
+docker compose logs -f load-generator
 ```
 
 Telemetry is exported to the **debug** exporter by default (visible in `docker compose logs otel-collector`).
@@ -201,11 +201,11 @@ docker compose logs -f otel-collector
 | Cart (Java) | 200 MB |
 | Checkout (Python) | 50 MB |
 | Payment (Rust) | 10 MB |
-| Load Generator (Locust) | 300 MB |
+| Load Generator (k6) | 128 MB |
 | OTel Collector | 100 MB |
 | PostgreSQL | 80 MB |
 | Valkey | 20 MB |
-| **Total** | **~1,030 MB** |
+| **Total** | **~858 MB** |
 
 Fits comfortably in a 4-core / 8 GB GitHub Codespace.
 
@@ -213,7 +213,7 @@ Fits comfortably in a 4-core / 8 GB GitHub Codespace.
 
 ```bash
 kubectl apply -k kubernetes/
-# Frontend at NodePort 30080, Locust UI at NodePort 30089
+# Frontend at NodePort 30080
 ```
 
 ### Helm Chart
@@ -257,7 +257,7 @@ src/
   cart/                   # Java (port 7070)
   checkout/               # Python (port 5050)
   payment/                # Rust (port 6060)
-  load-generator/         # Python / Locust (port 8089)
+  load-generator/         # k6 with xk6-output-opentelemetry
   postgres/               # PostgreSQL init scripts
 helm/                     # Helm chart
 kubernetes/               # Kustomize manifests

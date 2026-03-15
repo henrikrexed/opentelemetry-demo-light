@@ -1,19 +1,21 @@
-FROM python:3.12-slim
+FROM grafana/xk6:latest AS builder
 
-WORKDIR /app
+RUN xk6 build \
+  --with github.com/grafana/xk6-output-opentelemetry
 
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+FROM alpine:3.19
 
-COPY locustfile.py .
+COPY --from=builder /xk6/k6 /usr/bin/k6
+COPY test.js /scripts/test.js
+COPY run.sh /scripts/run.sh
 
-ENV LOCUST_HOST=http://frontend:8080
-ENV LOCUST_USERS=5
-ENV LOCUST_SPAWN_RATE=1
-ENV LOCUST_WEB_PORT=8089
-ENV LOCUST_AUTOSTART=true
+RUN chmod +x /scripts/run.sh
 
-EXPOSE 8089
+ENV FRONTEND_URL=http://frontend:8080
+ENV K6_VUS=5
+ENV K6_DURATION=0
+ENV K6_OTEL_GRPC_EXPORTER_INSECURE=true
+ENV K6_OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector:4317
+ENV OTEL_SERVICE_NAME=load-generator
 
-# Locust reads config from environment variables natively
-CMD ["locust"]
+ENTRYPOINT ["/scripts/run.sh"]

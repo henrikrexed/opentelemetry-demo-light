@@ -125,11 +125,10 @@ payment:
 loadGenerator:
   enabled: true
   replicas: 1
-  port: 8089
-  users: 5
-  spawnRate: 1
+  vus: 5
+  duration: "0"  # 0 = run forever
   resources:
     limits:
-      memory: 300Mi
-    requests:
       memory: 128Mi
+    requests:
+      memory: 64Mi

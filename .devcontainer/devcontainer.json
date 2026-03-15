@@ -5,17 +5,15 @@
   "workspaceFolder": "/workspace",
   "forwardPorts": [
     8080,
-    8089,
     4317,
     4318
   ],
   "portsAttributes": {
     "8080": { "label": "Frontend", "onAutoForward": "openBrowser" },
-    "8089": { "label": "Locust UI", "onAutoForward": "notify" },
     "4317": { "label": "OTel Collector gRPC", "onAutoForward": "silent" },
     "4318": { "label": "OTel Collector HTTP", "onAutoForward": "silent" }
   },
-  "postCreateCommand": "echo '✅ OpenTelemetry Demo Light is starting...' && sleep 10 && echo '🔭 Frontend: http://localhost:8080' && echo '📊 Locust UI: http://localhost:8089'",
+  "postCreateCommand": "echo '✅ OpenTelemetry Demo Light is starting...' && sleep 10 && echo '🔭 Frontend: http://localhost:8080' && echo '📊 k6 logs: docker compose logs -f load-generator'",
   "customizations": {
     "vscode": {
       "extensions": [

@@ -14,7 +14,7 @@ graph TB
     VK["Valkey"]
     Collector["OTel Collector<br/>:4317 / :4318"]
     Backend["Your Backend<br/>(Jaeger, Grafana, etc.)"]
-    LG["Load Generator<br/>Locust :8089"]
+    LG["Load Generator<br/>k6 + OTel"]
 
     Browser -->|HTTP| Frontend
     Frontend -->|gRPC| PC
@@ -159,7 +159,7 @@ erDiagram
 
 ## Resource Budget
 
-Total steady-state memory: **~1,030 MB** (470 MB headroom to 1.5 GB limit).
+Total steady-state memory: **~858 MB** (642 MB headroom to 1.5 GB limit).
 
 | Component | Memory Limit | Notes |
 |-----------|-------------|-------|
@@ -168,7 +168,7 @@ Total steady-state memory: **~1,030 MB** (470 MB headroom to 1.5 GB limit).
 | Cart | 200 MB | JVM + `-Xmx128m` heap |
 | Checkout | 50 MB | Python interpreter + grpcio |
 | Payment | 10 MB | Rust static binary |
-| Load Generator | 300 MB | Locust + simulated user state |
+| Load Generator | 128 MB | k6 binary + virtual users |
 | OTel Collector | 100 MB | Batch buffering + memory limiter |
 | PostgreSQL | 80 MB | Shared buffers for 2 databases |
 | Valkey | 20 MB | In-memory cache, small dataset |

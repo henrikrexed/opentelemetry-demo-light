@@ -78,11 +78,11 @@ Each service supports `replicas`, `port`, and `resources`:
 | `cart` | 7070 | 200Mi |
 | `checkout` | 5050 | 50Mi |
 | `payment` | 6060 | 10Mi |
-| `loadGenerator` | 8089 | 300Mi |
+| `loadGenerator` | — (headless) | 128Mi |
 
 Cart-specific: `cart.jvmOpts` (default: `-Xmx128m`)
 
-Load generator: `loadGenerator.enabled`, `loadGenerator.users`, `loadGenerator.spawnRate`
+Load generator: `loadGenerator.enabled`, `loadGenerator.vus`, `loadGenerator.duration`
 
 ## Examples
 
@@ -99,8 +99,7 @@ metrics:
   aggregation: delta
 
 loadGenerator:
-  users: 10
-  spawnRate: 2
+  vus: 10
 ```
 
 ### Gateway API with Istio + TLS

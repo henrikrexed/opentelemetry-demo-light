@@ -20,10 +20,10 @@ kubectl port-forward -n otel-demo-light svc/frontend 8080:8080
 open http://<node-ip>:30080
 ```
 
-### Access Locust UI
+### View k6 Load Generator Logs
 
 ```bash
-kubectl port-forward -n otel-demo-light svc/load-generator 8089:8089
+kubectl logs -n otel-demo-light -l app=load-generator -f
 ```
 
 ## Option B: Helm
@@ -37,7 +37,7 @@ helm install demo helm/opentelemetry-demo-light/
 ```bash
 helm install demo helm/opentelemetry-demo-light/ \
   --set collector.resources.limits.memory=512Mi \
-  --set loadGenerator.users=10
+  --set loadGenerator.vus=10
 ```
 
 ### With a values file

@@ -30,6 +30,8 @@ jobs:
             context: src/checkout
           - service: payment
             context: src/payment
+          - service: load-generator
+            context: src/load-generator
     steps:
       - uses: actions/checkout@v4
 

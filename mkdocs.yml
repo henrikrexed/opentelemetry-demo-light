@@ -39,4 +39,5 @@ nav:
       - Cart (Java): services/cart.md
       - Checkout (Python): services/checkout.md
       - Payment (Rust): services/payment.md
+      - Load Generator (k6): services/load-generator.md
   - Observability: observability.md

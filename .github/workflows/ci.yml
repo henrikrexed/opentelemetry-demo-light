@@ -145,3 +145,19 @@ jobs:
 
       - name: Docker build
         run: docker build -t frontend:ci .
+
+  load-generator:
+    name: Load Generator (k6)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: src/load-generator
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate k6 script syntax
+        run: |
+          docker run --rm -v "$PWD":/scripts grafana/k6:latest run --dry-run /scripts/test.js
+
+      - name: Docker build
+        run: docker build -t load-generator:ci .
