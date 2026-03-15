@@ -36,7 +36,7 @@ All services --OTLP--> OTel Collector --OTLP--> Your Backend
 
 ```bash
 # 1. Clone
-git clone https://github.com/your-org/opentelemetry-demo-light.git
+git clone https://github.com/henrikrexed/opentelemetry-demo-light.git
 cd opentelemetry-demo-light
 
 # 2. Start
