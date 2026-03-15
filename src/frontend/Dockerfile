@@ -18,6 +18,7 @@ COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static ./.next/static
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/proto ./proto
+# Proto must also be at the path webpack resolves via __dirname in route bundlesCOPY --from=builder /app/proto ./.next/server/protoCOPY --from=builder /app/proto ./.next/server/app/protoCOPY --from=builder /app/proto ./.next/server/app/api/protoCOPY --from=builder /app/proto ./.next/server/chunks/proto
 COPY --from=builder /app/instrumentation.js ./instrumentation.js
 
 # grpc_health_probe for health checks
