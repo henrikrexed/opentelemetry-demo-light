@@ -157,7 +157,7 @@ jobs:
 
       - name: Validate k6 script syntax
         run: |
-          docker run --rm -v "$PWD":/scripts grafana/k6:latest run --dry-run /scripts/test.js
+          docker run --rm -v "$PWD":/scripts grafana/k6:latest inspect /scripts/test.js
 
       - name: Docker build
         run: docker build -t load-generator:ci .
