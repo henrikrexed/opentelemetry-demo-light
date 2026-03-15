@@ -8,7 +8,8 @@ COPY src ./src
 RUN gradle fatJar --no-daemon
 
 # Download OTel Java agent
-RUN wget -qO/opentelemetry-javaagent.jar     https://github.com/open-telemetry/opentelemetry-java-instrumentation/releases/download/v2.2.0/opentelemetry-javaagent.jar
+RUN wget -qO/opentelemetry-javaagent.jar \
+    https://github.com/open-telemetry/opentelemetry-java-instrumentation/releases/download/v2.14.0/opentelemetry-javaagent.jar
 
 # Download grpc_health_probe
 RUN GRPC_HEALTH_PROBE_VERSION=v0.4.25 &&     wget -qO/grpc_health_probe     https://github.com/grpc-ecosystem/grpc-health-probe/releases/download/${GRPC_HEALTH_PROBE_VERSION}/grpc_health_probe-linux-amd64 &&     chmod +x /grpc_health_probe

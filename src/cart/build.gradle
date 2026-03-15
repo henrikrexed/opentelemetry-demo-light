@@ -17,39 +17,39 @@ repositories {
 
 dependencies {
     // gRPC
-    implementation 'io.grpc:grpc-netty-shaded:1.62.2'
-    implementation 'io.grpc:grpc-protobuf:1.62.2'
-    implementation 'io.grpc:grpc-stub:1.62.2'
-    implementation 'io.grpc:grpc-services:1.62.2'
+    implementation 'io.grpc:grpc-netty-shaded:1.72.0'
+    implementation 'io.grpc:grpc-protobuf:1.72.0'
+    implementation 'io.grpc:grpc-stub:1.72.0'
+    implementation 'io.grpc:grpc-services:1.72.0'
 
     // Protobuf
-    implementation 'com.google.protobuf:protobuf-java:3.25.3'
+    implementation 'com.google.protobuf:protobuf-java:4.29.3'
 
     // Redis/Valkey client
-    implementation 'redis.clients:jedis:5.1.2'
+    implementation 'redis.clients:jedis:5.2.0'
 
     // JSON serialization for cart storage
-    implementation 'com.google.code.gson:gson:2.10.1'
+    implementation 'com.google.code.gson:gson:2.11.0'
 
     // OTel API for custom metrics only (no manual instrumentation in business logic)
-    implementation 'io.opentelemetry:opentelemetry-api:1.36.0'
+    implementation 'io.opentelemetry:opentelemetry-api:1.46.0'
 
     // Required for protobuf generated code
     compileOnly 'org.apache.tomcat:annotations-api:6.0.53'
 
     // Testing
-    testImplementation 'org.junit.jupiter:junit-jupiter:5.10.2'
-    testImplementation 'org.mockito:mockito-core:5.11.0'
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.11.4'
+    testImplementation 'org.mockito:mockito-core:5.15.2'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
 protobuf {
     protoc {
-        artifact = 'com.google.protobuf:protoc:3.25.3'
+        artifact = 'com.google.protobuf:protoc:4.29.3'
     }
     plugins {
         grpc {
-            artifact = 'io.grpc:protoc-gen-grpc-java:1.62.2'
+            artifact = 'io.grpc:protoc-gen-grpc-java:1.72.0'
         }
     }
     generateProtoTasks {
