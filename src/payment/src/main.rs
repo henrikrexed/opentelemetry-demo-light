@@ -2,11 +2,11 @@ use std::env;
 
 use opentelemetry::global;
 use opentelemetry::metrics::Counter;
-use opentelemetry::trace::{Span, SpanKind, Status, Tracer};
+use opentelemetry::trace::{Span, SpanKind, Status, Tracer, TracerProvider};
 use opentelemetry::KeyValue;
 use opentelemetry_otlp::{MetricExporter, SpanExporter, WithExportConfig};
 use opentelemetry_sdk::metrics::SdkMeterProvider;
-use opentelemetry_sdk::trace::TracerProvider;
+use opentelemetry_sdk::trace::{SdkTracerProvider, SdkTracer};
 use opentelemetry_sdk::Resource;
 use tonic::{transport::Server, Request, Response};
 use uuid::Uuid;
@@ -19,13 +19,13 @@ use oteldemo::payment_service_server::{PaymentService, PaymentServiceServer};
 use oteldemo::{ProcessPaymentRequest, ProcessPaymentResponse};
 
 pub struct PaymentServiceImpl {
-    tracer: opentelemetry_sdk::trace::Tracer,
+    tracer: SdkTracer,
     payments_counter: Counter<u64>,
     amount_counter: Counter<u64>,
 }
 
 impl PaymentServiceImpl {
-    fn new(tracer: opentelemetry_sdk::trace::Tracer) -> Self {
+    fn new(tracer: SdkTracer) -> Self {
         let meter = global::meter("payment");
         let payments_counter = meter
             .u64_counter("app.payment.processed.total")
@@ -168,7 +168,7 @@ fn build_resource() -> Resource {
         .build()
 }
 
-fn init_tracer_provider() -> TracerProvider {
+fn init_tracer_provider() -> SdkTracerProvider {
     let endpoint =
         env::var("OTEL_EXPORTER_OTLP_ENDPOINT").unwrap_or_else(|_| "http://localhost:4317".into());
 
@@ -178,7 +178,7 @@ fn init_tracer_provider() -> TracerProvider {
         .build()
         .expect("failed to create OTLP span exporter");
 
-    TracerProvider::builder()
+    SdkTracerProvider::builder()
         .with_resource(build_resource())
         .with_batch_exporter(exporter)
         .build()
@@ -232,7 +232,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .serve(addr)
         .await?;
 
-    opentelemetry::global::shutdown_tracer_provider();
+    // TracerProvider and MeterProvider are shut down on drop
     Ok(())
 }
 
@@ -241,8 +241,8 @@ mod tests {
     use super::*;
     use oteldemo::{CreditCardInfo, Money};
 
-    fn test_tracer() -> opentelemetry_sdk::trace::Tracer {
-        let provider = TracerProvider::builder().build();
+    fn test_tracer() -> SdkTracer {
+        let provider = SdkTracerProvider::builder().build();
         provider.tracer("test")
     }
 
