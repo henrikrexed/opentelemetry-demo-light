@@ -4,24 +4,103 @@ A lightweight fork of the [opentelemetry-demo](https://github.com/open-telemetry
 
 ## Architecture
 
-```
-Browser (HTTP)
-    |
-    v
-Frontend (Node.js / Next.js) :8080
-    | gRPC
-    +------------------+------------------+
-    v                  v                  v
-Product Catalog    Cart (Java)     Checkout (Python)
-   (Go) :3550      :7070             :5050
-    |                |                 |  |  |
-    v              Valkey             Cart PC Payment
-PostgreSQL        (cache)                      (Rust) :6060
-(products)                                  |
-                                         PostgreSQL
-                                         (orders)
+```mermaid
+graph TB
+    Browser["🌐 Browser<br/><i>OTel Web SDK</i>"]
+    Frontend["Frontend<br/><b>Node.js / Next.js</b><br/>:8080"]
+    PC["Product Catalog<br/><b>Go</b><br/>:3550"]
+    Cart["Cart<br/><b>Java</b><br/>:7070"]
+    CO["Checkout<br/><b>Python</b><br/>:5050"]
+    Pay["Payment<br/><b>Rust</b><br/>:6060"]
+    PG[("PostgreSQL")]
+    VK[("Valkey")]
+    Collector["OTel Collector<br/>:4317 / :4318"]
+    Backend["📊 Your Backend<br/><i>Jaeger, Grafana, Dynatrace...</i>"]
+    LG["Load Generator<br/><b>Locust</b> :8089"]
 
-All services --OTLP--> OTel Collector --OTLP--> Your Backend
+    Browser -->|HTTP| Frontend
+    Frontend -->|gRPC| PC
+    Frontend -->|gRPC| Cart
+    Frontend -->|gRPC| CO
+
+    CO -->|gRPC| Cart
+    CO -->|gRPC| PC
+    CO -->|gRPC| Pay
+
+    PC -->|SQL| PG
+    CO -->|SQL| PG
+    Cart -->|Redis protocol| VK
+
+    Frontend -.->|OTLP| Collector
+    PC -.->|OTLP| Collector
+    Cart -.->|OTLP| Collector
+    CO -.->|OTLP| Collector
+    Pay -.->|OTLP| Collector
+    Collector -.->|OTLP| Backend
+
+    LG -->|HTTP| Frontend
+
+    style Frontend fill:#4a90d9,color:#fff
+    style PC fill:#00b894,color:#fff
+    style Cart fill:#e17055,color:#fff
+    style CO fill:#fdcb6e,color:#333
+    style Pay fill:#a29bfe,color:#fff
+    style Collector fill:#636e72,color:#fff
+    style Backend fill:#2d3436,color:#fff
+```
+
+### Checkout Flow
+
+A single checkout request produces a distributed trace across all 5 services:
+
+```mermaid
+sequenceDiagram
+    participant B as 🌐 Browser
+    participant F as Frontend
+    participant CO as Checkout
+    participant C as Cart
+    participant PC as Product Catalog
+    participant P as Payment
+    participant PG as PostgreSQL
+
+    B->>F: POST /api/checkout
+    F->>CO: gRPC PlaceOrder
+    CO->>C: gRPC GetCart
+    C-->>CO: Cart items
+    loop For each item
+        CO->>PC: gRPC GetProduct
+        PC-->>CO: Product + price
+    end
+    CO->>P: gRPC ProcessPayment
+    P-->>CO: Transaction ID
+    CO->>PG: INSERT order
+    PG-->>CO: Order saved
+    CO-->>F: Order confirmation
+    F-->>B: 200 OK
+```
+
+### Telemetry Pipeline
+
+```mermaid
+graph LR
+    subgraph Services
+        S1["Frontend<br/><i>auto</i>"]
+        S2["Product Catalog<br/><i>manual</i>"]
+        S3["Cart<br/><i>Java agent</i>"]
+        S4["Checkout<br/><i>auto+manual</i>"]
+        S5["Payment<br/><i>manual</i>"]
+    end
+
+    subgraph Collector["OTel Collector"]
+        R["OTLP Receiver"]
+        BP["Batch Processor"]
+        ML["Memory Limiter"]
+        E["OTLP Exporter"]
+    end
+
+    S1 & S2 & S3 & S4 & S5 -->|"traces + metrics + logs"| R
+    R --> ML --> BP --> E
+    E -->|OTLP| Backend["Your Backend"]
 ```
 
 | Service | Language | Port | OTel Pattern |
@@ -104,14 +183,14 @@ docker compose logs -f otel-collector
 
 ## OTel Features Demonstrated
 
-1. **Auto-instrumentation** -- Java agent (Cart), Python auto (Checkout), Node.js auto (Frontend)
-2. **Manual instrumentation** -- Go manual spans (Product Catalog), Rust manual spans (Payment)
-3. **Context propagation** -- W3C TraceContext across HTTP and gRPC, 5-service distributed trace
-4. **Baggage propagation** -- Metadata flowing across services (Product Catalog)
-5. **Metrics** -- RED metrics (auto) + custom business metrics (cart count, payment amount)
-6. **Structured logs** -- Trace-correlated logging with trace_id/span_id (Checkout)
-7. **Database instrumentation** -- PostgreSQL query spans
-8. **Cache instrumentation** -- Valkey/Redis spans from Java agent
+1. **Auto-instrumentation** — Java agent (Cart), Python auto (Checkout), Node.js auto (Frontend)
+2. **Manual instrumentation** — Go manual spans (Product Catalog), Rust manual spans (Payment)
+3. **Context propagation** — W3C TraceContext across HTTP and gRPC, 5-service distributed trace
+4. **Baggage propagation** — Metadata flowing across services (Product Catalog)
+5. **Metrics** — RED metrics (auto) + custom business metrics (cart count, payment amount)
+6. **Structured logs** — Trace-correlated logging with trace_id/span_id (Checkout)
+7. **Database instrumentation** — PostgreSQL query spans
+8. **Cache instrumentation** — Valkey/Redis spans from Java agent
 
 ## Resource Budget
 
@@ -137,6 +216,37 @@ kubectl apply -k kubernetes/
 # Frontend at NodePort 30080, Locust UI at NodePort 30089
 ```
 
+### Helm Chart
+
+```bash
+helm install demo helm/opentelemetry-demo-light/
+
+# BYOB mode (no collector, send directly to your backend)
+helm install demo helm/opentelemetry-demo-light/ \
+  --set collector.enabled=false \
+  --set otlp.endpoint=https://your-backend:4317
+
+# Delta metrics aggregation
+helm install demo helm/opentelemetry-demo-light/ \
+  --set metrics.aggregation=delta
+
+# Expose via Gateway API (e.g. Istio)
+helm install demo helm/opentelemetry-demo-light/ \
+  --set gateway.enabled=true \
+  --set gateway.provider=istio \
+  --set gateway.hostname=demo.example.com
+```
+
+## Documentation
+
+Full docs (architecture, getting started, per-service instrumentation guides): run locally with MkDocs:
+
+```bash
+pip install mkdocs-material
+mkdocs serve
+# Open http://localhost:8000
+```
+
 ## Project Structure
 
 ```
@@ -149,7 +259,9 @@ src/
   payment/                # Rust (port 6060)
   load-generator/         # Python / Locust (port 8089)
   postgres/               # PostgreSQL init scripts
+helm/                     # Helm chart
 kubernetes/               # Kustomize manifests
+docs/                     # MkDocs documentation
 otel-collector-config.yaml
 docker-compose.yaml
 ```
