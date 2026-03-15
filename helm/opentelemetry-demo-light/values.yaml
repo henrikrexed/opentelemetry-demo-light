@@ -126,7 +126,7 @@ loadGenerator:
   enabled: true
   replicas: 1
   vus: 5
-  duration: "0"  # 0 = run forever
+  duration: "87600h"  # ~10 years, effectively forever
   resources:
     limits:
       memory: 128Mi
