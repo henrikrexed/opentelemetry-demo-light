@@ -53,27 +53,27 @@ valkey:
 images:
   frontend:
     repository: ghcr.io/henrikrexed/opentelemetry-demo-light/frontend
-    tag: "0.0.2"
+    tag: "0.0.3"
     pullPolicy: IfNotPresent
   productCatalog:
     repository: ghcr.io/henrikrexed/opentelemetry-demo-light/product-catalog
-    tag: "0.0.2"
+    tag: "0.0.3"
     pullPolicy: IfNotPresent
   cart:
     repository: ghcr.io/henrikrexed/opentelemetry-demo-light/cart
-    tag: "0.0.2"
+    tag: "0.0.3"
     pullPolicy: IfNotPresent
   checkout:
     repository: ghcr.io/henrikrexed/opentelemetry-demo-light/checkout
-    tag: "0.0.2"
+    tag: "0.0.3"
     pullPolicy: IfNotPresent
   payment:
     repository: ghcr.io/henrikrexed/opentelemetry-demo-light/payment
-    tag: "0.0.2"
+    tag: "0.0.3"
     pullPolicy: IfNotPresent
   loadGenerator:
     repository: ghcr.io/henrikrexed/opentelemetry-demo-light/load-generator
-    tag: "0.0.2"
+    tag: "0.0.3"
     pullPolicy: IfNotPresent
 
 frontend:
