@@ -78,23 +78,23 @@ epics:
 
   - id: epic-5
     name: "Checkout Service (Python)"
-    status: backlog
+    status: done
     stories:
       - id: "5.1"
         name: "gRPC Server and PlaceOrder Endpoint"
-        status: backlog
+        status: done
       - id: "5.2"
         name: "Dockerfile and Build"
-        status: backlog
+        status: done
       - id: "5.3"
         name: "Python Auto + Manual Instrumentation"
-        status: backlog
+        status: done
       - id: "5.4"
         name: "Context Propagation"
-        status: backlog
+        status: done
       - id: "5.5"
         name: "Structured Logging with Trace Correlation"
-        status: backlog
+        status: done
 
   - id: epic-6
     name: "Frontend Service (Node.js / Next.js)"

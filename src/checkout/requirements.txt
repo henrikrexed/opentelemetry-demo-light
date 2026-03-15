@@ -1,0 +1,13 @@
+grpcio==1.62.1
+grpcio-tools==1.62.1
+grpcio-health-checking==1.62.1
+protobuf==4.25.3
+psycopg2-binary==2.9.9
+
+# OTel auto-instrumentation
+opentelemetry-api==1.23.0
+opentelemetry-sdk==1.23.0
+opentelemetry-exporter-otlp==1.23.0
+opentelemetry-instrumentation-grpc==0.44b0
+opentelemetry-instrumentation-psycopg2==0.44b0
+opentelemetry-distro==0.44b0
