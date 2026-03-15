@@ -46,3 +46,7 @@ src/**/*_pb2_grpc.py
 
 # Docker
 docker-compose.override.yaml
+
+_bmad/
+_bmad-output/
+.claude/
