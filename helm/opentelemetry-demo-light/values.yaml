@@ -52,28 +52,28 @@ valkey:
 # Per-service configuration
 images:
   frontend:
-    repository: otel-demo-light/frontend
-    tag: latest
+    repository: ghcr.io/henrikrexed/opentelemetry-demo-light/frontend
+    tag: "0.0.1"
     pullPolicy: IfNotPresent
   productCatalog:
-    repository: otel-demo-light/product-catalog
-    tag: latest
+    repository: ghcr.io/henrikrexed/opentelemetry-demo-light/product-catalog
+    tag: "0.0.1"
     pullPolicy: IfNotPresent
   cart:
-    repository: otel-demo-light/cart
-    tag: latest
+    repository: ghcr.io/henrikrexed/opentelemetry-demo-light/cart
+    tag: "0.0.1"
     pullPolicy: IfNotPresent
   checkout:
-    repository: otel-demo-light/checkout
-    tag: latest
+    repository: ghcr.io/henrikrexed/opentelemetry-demo-light/checkout
+    tag: "0.0.1"
     pullPolicy: IfNotPresent
   payment:
-    repository: otel-demo-light/payment
-    tag: latest
+    repository: ghcr.io/henrikrexed/opentelemetry-demo-light/payment
+    tag: "0.0.1"
     pullPolicy: IfNotPresent
   loadGenerator:
-    repository: otel-demo-light/load-generator
-    tag: latest
+    repository: ghcr.io/henrikrexed/opentelemetry-demo-light/load-generator
+    tag: "0.0.1"
     pullPolicy: IfNotPresent
 
 frontend:
