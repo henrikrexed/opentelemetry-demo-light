@@ -2,7 +2,7 @@ apiVersion: v2
 name: opentelemetry-demo-light
 description: A lightweight OpenTelemetry demo — 5 microservices in 5 languages
 type: application
-version: 0.2.3
+version: 0.2.4
 appVersion: "1.0.0"
 keywords:
   - opentelemetry

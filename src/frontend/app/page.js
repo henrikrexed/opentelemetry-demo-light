@@ -22,7 +22,26 @@ export default function HomePage() {
 
   return (
     <div>
-      <h1>Products</h1>
+      <div style={{
+        borderRadius: '12px', overflow: 'hidden', marginBottom: '2rem',
+        position: 'relative', height: '300px'
+      }}>
+        <img
+          src="/images/banner.jpg"
+          alt="OTel Demo Light"
+          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+        />
+        <div style={{
+          position: 'absolute', bottom: 0, left: 0, right: 0,
+          background: 'linear-gradient(transparent, rgba(0,0,0,0.7))',
+          padding: '2rem', color: 'white'
+        }}>
+          <h1 style={{ margin: 0, fontSize: '2rem' }}>Welcome to the Astronomy Shop</h1>
+          <p style={{ margin: '0.5rem 0 0', opacity: 0.9 }}>Powered by OpenTelemetry</p>
+        </div>
+      </div>
+
+      <h2>Products</h2>
       <div style={{
         display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
         gap: '1.5rem'
