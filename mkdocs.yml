@@ -4,11 +4,11 @@ repo_url: https://github.com/henrikrexed/opentelemetry-demo-light
 
 theme:
   name: material
-    logo: assets/logo.png
-    favicon: assets/logo.png
+  logo: assets/logo.png
+  favicon: assets/logo.png
   palette:
     - scheme: default
-      primary: custom
+      primary: indigo
       accent: teal
   features:
     - navigation.tabs
