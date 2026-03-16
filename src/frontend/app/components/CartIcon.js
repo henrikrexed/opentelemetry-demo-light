@@ -23,19 +23,12 @@ export default function CartIcon() {
   }, []);
 
   return (
-    <a href="/cart" style={{ color: 'white', textDecoration: 'none', position: 'relative', fontSize: '1.5rem' }}>
-      🛒
-      {count > 0 && (
-        <span style={{
-          position: 'absolute', top: '-8px', right: '-12px',
-          background: '#e94560', color: 'white', borderRadius: '50%',
-          width: '20px', height: '20px', fontSize: '0.7rem',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          fontWeight: 'bold'
-        }}>
-          {count > 99 ? '99+' : count}
-        </span>
-      )}
+    <a href="/cart" className="cart-icon-link">
+      <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#29293E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
+        <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+      </svg>
+      {count > 0 && <span className="cart-badge">{count > 99 ? '99+' : count}</span>}
     </a>
   );
 }

@@ -1,4 +1,5 @@
 import NavBar from './components/NavBar';
+import './globals.css';
 
 export const metadata = {
   title: 'OpenTelemetry Demo Light',
@@ -8,11 +9,14 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body style={{ fontFamily: 'system-ui, sans-serif', margin: 0, padding: 0, background: '#f5f5f5' }}>
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet" />
+      </head>
+      <body>
         <NavBar />
-        <main style={{ maxWidth: '1200px', margin: '2rem auto', padding: '0 1rem' }}>
-          {children}
-        </main>
+        <main>{children}</main>
       </body>
     </html>
   );
