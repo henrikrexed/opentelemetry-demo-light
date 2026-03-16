@@ -17,6 +17,15 @@ export default function HomePage() {
       .catch(() => setLoading(false));
   }, []);
 
+  async function quickAdd(productId) {
+    await fetch('/api/cart/add', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ productId, quantity: 1 }),
+    });
+    window.dispatchEvent(new Event('cart-updated'));
+  }
+
   if (loading) return <p style={{padding: '100px', textAlign: 'center'}}>Loading...</p>;
 
   return (
@@ -34,20 +43,21 @@ export default function HomePage() {
 
       <div id="products" className="product-grid">
         {products.map((product) => (
-          <a
-            key={product.id}
-            href={`/product/${product.id}`}
-            className="product-card"
-          >
-            <div
-              className="product-card-image"
-              style={{ backgroundImage: `url(${product.picture})` }}
-            />
-            <p className="product-card-name">{product.name}</p>
-            <p className="product-card-price">
-              {formatPrice(product.priceUsd?.amountCents || 0)}
-            </p>
-          </a>
+          <div key={product.id} className="product-card">
+            <a href={`/product/${product.id}`} style={{ textDecoration: 'none' }}>
+              <div
+                className="product-card-image"
+                style={{ backgroundImage: `url(${product.picture})` }}
+              />
+              <p className="product-card-name">{product.name}</p>
+              <p className="product-card-price">
+                {formatPrice(product.priceUsd?.amountCents || 0)}
+              </p>
+            </a>
+            <button className="btn-add-cart-small" onClick={() => quickAdd(product.id)}>
+              Add to Cart
+            </button>
+          </div>
         ))}
       </div>
     </>
