@@ -1,12 +1,14 @@
 site_name: OpenTelemetry Demo Light
 site_description: A lightweight OTel demo — 5 microservices in 5 languages
-repo_url: https://github.com/your-org/opentelemetry-demo-light
+repo_url: https://github.com/henrikrexed/opentelemetry-demo-light
 
 theme:
   name: material
+    logo: assets/logo.png
+    favicon: assets/logo.png
   palette:
     - scheme: default
-      primary: indigo
+      primary: custom
       accent: teal
   features:
     - navigation.tabs
