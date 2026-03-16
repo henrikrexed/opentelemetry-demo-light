@@ -34,16 +34,25 @@ export default function HomePage() {
             style={{ textDecoration: 'none', color: 'inherit' }}
           >
             <div style={{
-              background: 'white', borderRadius: '8px', padding: '1.5rem',
+              background: 'white', borderRadius: '8px', overflow: 'hidden',
               boxShadow: '0 2px 4px rgba(0,0,0,0.1)', cursor: 'pointer'
             }}>
-              <h3 style={{ margin: '0 0 0.5rem' }}>{product.name}</h3>
-              <p style={{ color: '#666', fontSize: '0.9rem', margin: '0 0 0.5rem' }}>
-                {product.description?.substring(0, 100)}...
-              </p>
-              <p style={{ fontWeight: 'bold', color: '#2d6a4f', fontSize: '1.1rem', margin: 0 }}>
-                {formatPrice(product.priceUsd?.amountCents || 0)}
-              </p>
+              {product.picture && (
+                <img
+                  src={product.picture}
+                  alt={product.name}
+                  style={{ width: '100%', height: '200px', objectFit: 'cover' }}
+                />
+              )}
+              <div style={{ padding: '1rem' }}>
+                <h3 style={{ margin: '0 0 0.5rem' }}>{product.name}</h3>
+                <p style={{ color: '#666', fontSize: '0.9rem', margin: '0 0 0.5rem' }}>
+                  {product.description}
+                </p>
+                <p style={{ fontWeight: 'bold', color: '#2d6a4f', fontSize: '1.1rem', margin: 0 }}>
+                  {formatPrice(product.priceUsd?.amountCents || 0)}
+                </p>
+              </div>
             </div>
           </Link>
         ))}
