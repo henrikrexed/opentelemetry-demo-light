@@ -31,6 +31,7 @@ export default function ProductPage({ params }) {
       body: JSON.stringify({ productId: product.id, quantity }),
     });
     setAdded(true);
+    window.dispatchEvent(new Event("cart-updated"));
     setTimeout(() => setAdded(false), 2000);
   }
 
