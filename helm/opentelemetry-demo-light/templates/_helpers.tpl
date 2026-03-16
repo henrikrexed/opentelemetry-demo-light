@@ -32,9 +32,9 @@ Common OTel environment variables injected into every app service
 */}}
 {{- define "otel-demo.otelEnv" -}}
 - name: OTEL_EXPORTER_OTLP_ENDPOINT
+  value: {{ include "otel-demo.otlpEndpoint" . | quote }}
 - name: OTEL_EXPORTER_OTLP_PROTOCOL
   value: "grpc"
-  value: {{ include "otel-demo.otlpEndpoint" . | quote }}
 - name: OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE
   value: {{ .Values.metrics.aggregation | quote }}
 - name: PRODUCT_CATALOG_ADDR
