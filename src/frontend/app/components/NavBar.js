@@ -11,10 +11,7 @@ export default function NavBar() {
       <a href="/" style={{ color: 'white', textDecoration: 'none', fontSize: '1.25rem', fontWeight: 'bold' }}>
         🔭 OTel Demo Light
       </a>
-      <div style={{ display: 'flex', gap: '1.5rem', alignItems: 'center' }}>
-        <a href="/" style={{ color: '#ccc', textDecoration: 'none' }}>Products</a>
-        <CartIcon />
-      </div>
+      <CartIcon />
     </nav>
   );
 }
