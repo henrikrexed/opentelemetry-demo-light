@@ -29,13 +29,13 @@ kubectl logs -n otel-demo-light -l app=load-generator -f
 ## Option B: Helm
 
 ```bash
-helm install demo oci://ghcr.io/henrikrexed/opentelemetry-demo-light --version 0.1.0
+helm install demo oci://ghcr.io/henrikrexed/opentelemetry-demo-light --version 0.2.8
 ```
 
 ### With Custom Values
 
 ```bash
-helm install demo oci://ghcr.io/henrikrexed/opentelemetry-demo-light --version 0.1.0 \
+helm install demo oci://ghcr.io/henrikrexed/opentelemetry-demo-light --version 0.2.8 \
   --set collector.resources.limits.memory=512Mi \
   --set loadGenerator.vus=10
 ```
@@ -43,7 +43,7 @@ helm install demo oci://ghcr.io/henrikrexed/opentelemetry-demo-light --version 0
 ### With a values file
 
 ```bash
-helm install demo oci://ghcr.io/henrikrexed/opentelemetry-demo-light --version 0.1.0 -f my-values.yaml
+helm install demo oci://ghcr.io/henrikrexed/opentelemetry-demo-light --version 0.2.8 -f my-values.yaml
 ```
 
 See the [Helm Values Reference](helm-values.md) for all options.
@@ -51,7 +51,7 @@ See the [Helm Values Reference](helm-values.md) for all options.
 ### BYOB (No Collector)
 
 ```bash
-helm install demo oci://ghcr.io/henrikrexed/opentelemetry-demo-light --version 0.1.0 \
+helm install demo oci://ghcr.io/henrikrexed/opentelemetry-demo-light --version 0.2.8 \
   --set collector.enabled=false \
   --set otlp.endpoint=https://your-backend:4317
 ```
@@ -59,7 +59,7 @@ helm install demo oci://ghcr.io/henrikrexed/opentelemetry-demo-light --version 0
 ### With Gateway API
 
 ```bash
-helm install demo oci://ghcr.io/henrikrexed/opentelemetry-demo-light --version 0.1.0 \
+helm install demo oci://ghcr.io/henrikrexed/opentelemetry-demo-light --version 0.2.8 \
   --set gateway.enabled=true \
   --set gateway.provider=istio \
   --set gateway.hostname=demo.example.com
