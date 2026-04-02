@@ -27,6 +27,7 @@ jobs:
         run: |
           go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
           go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
+          sudo apt-get update
           sudo apt-get install -y protobuf-compiler
           mkdir -p genproto/oteldemo
           protoc --proto_path=../../proto \
@@ -81,7 +82,9 @@ jobs:
           workspaces: src/payment
 
       - name: Install protoc
-        run: sudo apt-get install -y protobuf-compiler
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y protobuf-compiler
 
       - name: Build
         run: cargo build
