@@ -32,6 +32,9 @@ jobs:
             context: src/payment
           - service: load-generator
             context: src/load-generator
+          - service: load-generator-dynatrace
+            context: src/load-generator
+            dockerfile: Dockerfile.dynatrace
     steps:
       - uses: actions/checkout@v4
 
@@ -62,6 +65,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: ${{ matrix.context }}
+          file: ${{ matrix.context }}/${{ matrix.dockerfile || 'Dockerfile' }}
           platforms: linux/amd64,linux/arm64
           push: true
           tags: ${{ steps.meta.outputs.tags }}

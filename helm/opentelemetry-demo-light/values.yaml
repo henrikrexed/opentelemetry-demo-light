@@ -127,6 +127,11 @@ loadGenerator:
   replicas: 1
   vus: 5
   duration: "87600h"  # ~10 years, effectively forever
+  # opentelemetry  — export k6 metrics via OTLP to the OTel Collector (default)
+  # output-dynatrace — export k6 metrics directly to Dynatrace API
+  outputMode: opentelemetry
+  dynatrace:
+    secretName: dynatrace-credentials  # K8s Secret with keys: url, apitoken
   resources:
     limits:
       memory: 128Mi

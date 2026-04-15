@@ -14,7 +14,12 @@ spec:
     spec:
       containers:
         - name: load-generator
-          image: ghcr.io/henrikrexed/opentelemetry-demo-light/load-generator:latest
+          image: ghcr.io/henrikrexed/henrikrexed-xk6-output-opentelemetry:latest
+          args:
+            - run
+            - --out
+            - opentelemetry
+            - /scripts/test.js
           env:
             - name: FRONTEND_URL
               value: http://frontend:8080
@@ -22,16 +27,28 @@ spec:
               value: "5"
             - name: K6_DURATION
               value: "0"
-            - name: K6_OUTPUT_MODE
-              value: opentelemetry
             - name: K6_OTEL_GRPC_EXPORTER_INSECURE
               value: "true"
             - name: K6_OTEL_EXPORTER_OTLP_ENDPOINT
-              value: http://otel-collector:4317
-            - name: OTEL_SERVICE_NAME
+              value: otel-collector:4317
+            - name: K6_OTEL_SERVICE_NAME
               value: load-generator
+            - name: K6_OTEL_TRACES_ENABLED
+              value: "true"
+            - name: K6_OTEL_METRICS_ENABLED
+              value: "true"
+            - name: K6_OTEL_BAGGAGE_ENABLED
+              value: "true"
+          volumeMounts:
+            - name: test-script
+              mountPath: /scripts/test.js
+              subPath: test.js
           resources:
             limits:
               memory: 128Mi
             requests:
               memory: 64Mi
+      volumes:
+        - name: test-script
+          configMap:
+            name: k6-test-script

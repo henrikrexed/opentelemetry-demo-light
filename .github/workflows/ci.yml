@@ -162,5 +162,8 @@ jobs:
         run: |
           echo "k6 script validation happens during Docker build (custom extension required)"
 
-      - name: Docker build
+      - name: Docker build (OTel)
         run: docker build -t load-generator:ci .
+
+      - name: Docker build (Dynatrace)
+        run: docker build -f Dockerfile.dynatrace -t load-generator-dynatrace:ci .

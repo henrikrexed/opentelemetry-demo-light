@@ -1,20 +1,20 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: load-generator
+  name: load-generator-dynatrace
 spec:
-  replicas: 1
+  replicas: 0
   selector:
     matchLabels:
-      app: load-generator
+      app: load-generator-dynatrace
   template:
     metadata:
       labels:
-        app: load-generator
+        app: load-generator-dynatrace
     spec:
       containers:
         - name: load-generator
-          image: ghcr.io/henrikrexed/opentelemetry-demo-light/load-generator:latest
+          image: ghcr.io/henrikrexed/opentelemetry-demo-light/load-generator-dynatrace:latest
           env:
             - name: FRONTEND_URL
               value: http://frontend:8080
@@ -23,11 +23,17 @@ spec:
             - name: K6_DURATION
               value: "0"
             - name: K6_OUTPUT_MODE
-              value: opentelemetry
-            - name: K6_OTEL_GRPC_EXPORTER_INSECURE
-              value: "true"
-            - name: K6_OTEL_EXPORTER_OTLP_ENDPOINT
-              value: http://otel-collector:4317
+              value: output-dynatrace
+            - name: K6_DYNATRACE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: dynatrace-credentials
+                  key: url
+            - name: K6_DYNATRACE_APITOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: dynatrace-credentials
+                  key: apitoken
             - name: OTEL_SERVICE_NAME
               value: load-generator
           resources:

@@ -237,6 +237,7 @@ services:
       FRONTEND_URL: http://frontend:8080
       K6_VUS: ${K6_VUS:-5}
       K6_DURATION: ${K6_DURATION:-0}
+      K6_OUTPUT_MODE: opentelemetry
       K6_OTEL_GRPC_EXPORTER_INSECURE: "true"
       K6_OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4317
       OTEL_SERVICE_NAME: load-generator
@@ -244,6 +245,33 @@ services:
       - demo
     mem_limit: 128m
     logging: *default-logging
+    depends_on:
+      frontend:
+        condition: service_healthy
+
+  # ---------------------------------------------------------------------------
+  # Optional: Dynatrace load generator (use with --profile dynatrace)
+  # ---------------------------------------------------------------------------
+
+  load-generator-dynatrace:
+    build:
+      context: ./src/load-generator
+      dockerfile: Dockerfile.dynatrace
+    container_name: load-generator-dynatrace
+    environment:
+      FRONTEND_URL: http://frontend:8080
+      K6_VUS: ${K6_VUS:-5}
+      K6_DURATION: ${K6_DURATION:-0}
+      K6_OUTPUT_MODE: output-dynatrace
+      K6_DYNATRACE_URL: ${K6_DYNATRACE_URL}
+      K6_DYNATRACE_APITOKEN: ${K6_DYNATRACE_APITOKEN}
+      OTEL_SERVICE_NAME: load-generator
+    networks:
+      - demo
+    mem_limit: 128m
+    logging: *default-logging
+    profiles:
+      - dynatrace
     depends_on:
       frontend:
         condition: service_healthy

@@ -1,8 +1,12 @@
 #!/bin/sh
 # Entrypoint for the k6 load generator.
-# Starts k6 with the xk6-output-opentelemetry extension sending
-# metrics to the OTel Collector via OTLP/gRPC.
+#
+# K6_OUTPUT_MODE selects the output extension:
+#   opentelemetry    — xk6-output-opentelemetry (default)
+#   output-dynatrace — xk6-output-dynatrace
+
+OUTPUT="${K6_OUTPUT_MODE:-opentelemetry}"
 
 exec /usr/bin/k6 run \
-  --out experimental-opentelemetry \
+  --out "${OUTPUT}" \
   /scripts/test.js
