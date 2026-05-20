@@ -13,6 +13,7 @@ resources:
   - payment.yaml
   - checkout.yaml
   - frontend.yaml
+  - k6-test-script.yaml
   - load-generator.yaml
 
 configMapGenerator:

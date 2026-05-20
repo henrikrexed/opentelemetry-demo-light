@@ -35,3 +35,11 @@ spec:
               memory: 128Mi
             requests:
               memory: 64Mi
+          volumeMounts:
+            - name: test-script
+              mountPath: /scripts/test.js
+              subPath: test.js
+      volumes:
+        - name: test-script
+          configMap:
+            name: k6-test-script
