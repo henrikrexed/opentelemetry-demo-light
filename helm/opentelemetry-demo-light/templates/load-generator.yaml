@@ -28,7 +28,7 @@ spec:
               value: {{ .Values.loadGenerator.duration | quote }}
             - name: K6_OUTPUT_MODE
               value: {{ .Values.loadGenerator.outputMode | default "opentelemetry" | quote }}
-            {{- if eq (default "opentelemetry" .Values.loadGenerator.outputMode) "opentelemetry" }}
+            {{- if eq (default "otel-extended" .Values.loadGenerator.outputMode) "otel-extended" }}
             - name: K6_OTEL_GRPC_EXPORTER_INSECURE
               value: "true"
             - name: K6_OTEL_EXPORTER_OTLP_ENDPOINT
