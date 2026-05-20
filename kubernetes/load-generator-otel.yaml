@@ -18,7 +18,7 @@ spec:
           args:
             - run
             - --out
-            - opentelemetry
+            - otel-extended
             - /scripts/test.js
           env:
             - name: FRONTEND_URL
