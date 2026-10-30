@@ -22,45 +22,33 @@
 #
 # ===================================================================================
 # BASELINE — fixable CRITICAL/HIGH present on v0.0.14 images (vuln DB 2026-10-29).
-# Original baseline: 65 distinct CVEs (2 CRITICAL / 63 HIGH). Remediation in progress — Phase 5
-# (ISI-6867): burn down via dep/base bumps; Dependabot (.github/dependabot.yml) auto-opens most.
+# Original baseline: 65 distinct CVEs (2 CRITICAL / 63 HIGH). Phase 5 (ISI-6867) burn-down COMPLETE.
 # BURN-DOWN LOG:
 #   2026-10-30 (ISI-6867): product-catalog + load-generator-dynatrace Go builders bumped
 #     golang:1.25-alpine -> golang:1.26.10-alpine. Cleared 22 stdlib CVEs (toolchain was
 #     1.26.0 via GOTOOLCHAIN=auto; 1.26.10 fixes all stdlib advisories ≤1.26.10). -> 43 remain.
 #   2026-10-30 (ISI-6881, PR#40): load-generator + load-generator-dynatrace xk6 Go deps pinned
 #     (grpc 1.83.2, x/net 0.60.0, klauspost 1.18.7; x/crypto/x/text/otel resolve safe via MVS)
-#     and toolchain forced to go1.26.10. Cleared ~23 load-gen CVEs incl. CRITICAL CVE-2026-33186
-#     (grpc). The 4 mixed x/net+stdlib CVEs (33814/39821/46600/78669) stay — still carried by
-#     product-catalog — with svc: narrowed to product-catalog only.
+#     and toolchain forced to go1.26.10. Cleared ~23 load-gen CVEs incl. CRITICAL CVE-2026-33186.
 #   2026-10-30 (ISI-6885, PR#36): grpc_health_probe v0.4.60 -> v0.4.61 (go-jose/v4 4.1.6).
 #     Cleared CVE-2026-116587 (go-jose/v4).
 #   2026-10-30 (ISI-6883, PR#39): cart base 24 -> 25-jre-alpine + guava constraint 33.7.2-jre.
 #     Cleared CVE-2026-111497 (brotli-libs, CRITICAL) + CVE-2026-102554 (guava).
-#   2026-10-30 (ISI-6882): frontend npm transitive deps cleared by the node:25-alpine +
-#     next16/react19 lockfile regen (PR#26 — brace-expansion >=2.1.6; picomatch/sigstore/
-#     ip-address/pacote dropped from package-lock.json). Removed the 9 frontend suppressions
-#     (brace-expansion ×5, picomatch, sigstore, ip-address, pacote).
-# Remaining: 9 distinct CVEs (0 CRITICAL / 9 HIGH).
+#   2026-10-30 (ISI-6882, PR#38): frontend npm transitive deps cleared by node:25-alpine +
+#     next16/react19 lockfile regen. Removed the 9 frontend suppressions.
+#   2026-10-30 (ISI-6884, PR#37): checkout pip floor pins msgpack==1.2.3 / urllib3==2.8.0 /
+#     setuptools==84.2.1 force the CVE-fixed transitive versions into the image.
+#   2026-10-30 (ISI-6867 reconcile): removed the final 9 now-stale suppressions —
+#     * 5 checkout (CVE-2025-47273, CVE-2026-114613, CVE-2026-97687, CVE-2026-97689,
+#       GHSA-6v7p-g79w-8964): the ISI-6884 pins landed on main but the matching allowlist
+#       cleanup was dropped in a rebase; the CVEs are already fixed in the built image.
+#     * 4 product-catalog x/net+stdlib (CVE-2026-33814 / 39821 / 46600 / 78669): both sides now
+#       fixed — go.mod carries golang.org/x/net v0.62.0 (>= 0.60.0) and the builder is
+#       golang:1.26.10-alpine (stdlib >= 1.26.9). Verified clean by the per-service CI Trivy gate.
+# Remaining fixable baseline: 0 (0 CRITICAL / 0 HIGH). The active allowlist below is EMPTY;
+# the only suppressed CVEs are the ISI-6778 upstream-unfixed tail (reference section), which
+# carry no FixedVersion and are auto-excluded by the gate's --ignore-unfixed.
 # ===================================================================================
-# CVE-2025-47273  severity:HIGH  pkg:setuptools  fixed:78.1.1  svc:checkout  expires:2027-01-27  justification:pre-existing v0.0.14 baseline, remediation tracked in Phase 5 follow-up
-CVE-2025-47273
-# CVE-2026-114613  severity:HIGH  pkg:msgpack  fixed:1.2.3  svc:checkout  expires:2027-01-27  justification:pre-existing v0.0.14 baseline, remediation tracked in Phase 5 follow-up
-CVE-2026-114613
-# CVE-2026-33814  severity:HIGH  pkg:golang.org/x/net,stdlib  fixed:0.53.0 | 1.25.10, 1.26.3  svc:product-catalog  expires:2027-01-27  justification:pre-existing v0.0.14 baseline, remediation tracked in Phase 5 follow-up
-CVE-2026-33814
-# CVE-2026-39821  severity:HIGH  pkg:golang.org/x/net,stdlib  fixed:0.55.0 | 1.25.13, 1.26.6, 1.27.0-rc.3  svc:product-catalog  expires:2027-01-27  justification:pre-existing v0.0.14 baseline, remediation tracked in Phase 5 follow-up
-CVE-2026-39821
-# CVE-2026-46600  severity:HIGH  pkg:golang.org/x/net,stdlib  fixed:0.56.0 | 1.26.6, 1.27.0-rc.3  svc:product-catalog  expires:2027-01-27  justification:pre-existing v0.0.14 baseline, remediation tracked in Phase 5 follow-up
-CVE-2026-46600
-# CVE-2026-78669  severity:HIGH  pkg:golang.org/x/net,stdlib  fixed:0.60.0 | 1.26.9, 1.27.2  svc:product-catalog  expires:2027-01-27  justification:pre-existing v0.0.14 baseline, remediation tracked in Phase 5 follow-up
-CVE-2026-78669
-# CVE-2026-97687  severity:HIGH  pkg:urllib3  fixed:2.8.0  svc:checkout  expires:2027-01-27  justification:pre-existing v0.0.14 baseline, remediation tracked in Phase 5 follow-up
-CVE-2026-97687
-# CVE-2026-97689  severity:HIGH  pkg:urllib3  fixed:2.8.0  svc:checkout  expires:2027-01-27  justification:pre-existing v0.0.14 baseline, remediation tracked in Phase 5 follow-up
-CVE-2026-97689
-# GHSA-6v7p-g79w-8964  severity:HIGH  pkg:msgpack  fixed:1.2.1  svc:checkout  expires:2027-01-27  justification:pre-existing v0.0.14 baseline, remediation tracked in Phase 5 follow-up
-GHSA-6v7p-g79w-8964
 
 # ===================================================================================
 # REFERENCE ONLY — ISI-6778 carried upstream-unfixed tail (15 distinct HIGH, 0 CRIT).

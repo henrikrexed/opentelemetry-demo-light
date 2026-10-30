@@ -7,7 +7,15 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 WORKDIR /app
 
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+# Install deps, then strip pip itself. The checkout runtime never invokes pip, and pip's
+# bundled _vendor tree carries CVE-flagged copies of urllib3 2.7.0 / msgpack 1.1.2 /
+# setuptools 70.3.0 (CVE-2026-97687, CVE-2026-97689, CVE-2026-114613, GHSA-6v7p-g79w-8964,
+# CVE-2025-47273). pip freezes those vendored versions internally — pip 26.2.2 (latest)
+# still ships them — so they are not fixable via requirements pins. Removing pip removes
+# the vendored copies, keeping the .trivyignore fixable baseline at 0 (ISI-6867).
+# Standalone setuptools (84.2.1, from requirements.txt) is retained.
+RUN pip install --no-cache-dir -r requirements.txt && \
+    python -m pip uninstall -y pip
 
 COPY . .
 
