@@ -155,6 +155,30 @@ jobs:
       - name: Docker build
         run: docker build -t checkout:ci .
 
+      - name: Debug image python inventory
+        run: |
+          echo "== pip freeze in image =="
+          docker run --rm --entrypoint python checkout:ci -m pip list --format=freeze | grep -Ei 'msgpack|urllib3|setuptools|^pip ' || true
+          echo "== all dist-info dirs in image =="
+          docker run --rm --entrypoint sh checkout:ci -c 'find / -xdev -type d -name "*.dist-info" 2>/dev/null | sort' || true
+
+      - name: Trivy JSON debug
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          image-ref: checkout:ci
+          scanners: vuln
+          severity: CRITICAL,HIGH
+          ignore-unfixed: true
+          exit-code: "0"
+          format: json
+          output: trivy-debug.json
+          trivyignores: .trivyignore
+
+      - name: Dump trivy JSON python findings
+        run: |
+          jq '.Results[] | select(.Type == "python-pkg") | {Target, Vulns: [.Vulnerabilities[]? | {PkgName, InstalledVersion, FixedVersion, PkgPath, Layer}]}' trivy-debug.json || true
+          jq '.Results[] | select((.Vulnerabilities // []) | length > 0) | {Target, Type, count: (.Vulnerabilities | length)}' trivy-debug.json || true
+
       - name: Trivy CVE gate (fail on new fixable CRITICAL/HIGH)
         uses: aquasecurity/trivy-action@v0.36.0  # ed142fd0673e
         with:

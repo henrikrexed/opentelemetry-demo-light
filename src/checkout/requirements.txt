@@ -14,3 +14,11 @@ opentelemetry-exporter-otlp==1.45.1
 opentelemetry-instrumentation-grpc==0.66b1
 opentelemetry-instrumentation-psycopg2==0.66b1
 opentelemetry-distro==0.66b1
+
+# Security floor pins for transitive deps (ISI-6884, Phase 5 burn-down of ISI-6867).
+# Not imported directly; pinned to force the CVE-fixed versions into the image.
+#   msgpack  >=1.2.3  clears CVE-2026-114613 (1.2.3) + GHSA-6v7p-g79w-8964 (1.2.1)
+#   urllib3  >=2.8.0  clears CVE-2026-97687, CVE-2026-97689
+# setuptools (CVE-2025-47273, fixed 78.1.1) is already covered by the ==84.2.1 pin above.
+msgpack==1.2.3
+urllib3==2.8.0
