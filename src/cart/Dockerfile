@@ -16,6 +16,9 @@ RUN GRPC_HEALTH_PROBE_VERSION=v0.4.60 &&     wget -qO/grpc_health_probe     http
 
 FROM eclipse-temurin:24-jre-alpine
 
+# CVE gate (ISI-6873): temurin pins a stale alpine 3.22 snapshot; pull patched packages
+RUN apk upgrade --no-cache
+
 WORKDIR /app
 
 COPY --from=builder /build/build/libs/cart-1.0.0-all.jar /app/cart.jar
