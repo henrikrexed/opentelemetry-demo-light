@@ -11,6 +11,9 @@ RUN npm run build
 
 FROM node:25-alpine
 
+# CVE gate (ISI-6873): pull patched alpine packages (openssl CVE-2026-14456/45447)
+RUN apk upgrade --no-cache     && rm -rf /usr/local/lib/node_modules/npm /usr/local/bin/npm /usr/local/bin/npx
+
 WORKDIR /app
 
 # Copy standalone build output
