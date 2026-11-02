@@ -13,7 +13,7 @@ opentelemetry-sdk==1.45.1
 opentelemetry-exporter-otlp==1.45.1
 opentelemetry-instrumentation-grpc==0.66b1
 opentelemetry-instrumentation-psycopg2==0.66b1
-opentelemetry-distro==0.66b1
+opentelemetry-distro==0.66b2
 
 # Security floor pins for transitive deps (ISI-6884, Phase 5 burn-down of ISI-6867).
 # Not imported directly; pinned to force the CVE-fixed versions into the image.
