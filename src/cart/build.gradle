@@ -1,7 +1,7 @@
 plugins {
     id 'java'
     id 'application'
-    id 'com.google.protobuf' version '0.10.0'
+    id 'com.google.protobuf' version '0.10.1'
 }
 
 group = 'io.opentelemetry.demo'
@@ -19,7 +19,7 @@ dependencies {
     // Security pin: force transitive com.google.guava:guava (pulled in via gRPC) to a patched
     // release. Cart has no direct guava usage. CVE-2026-102554 (HIGH) fixed in 33.7.2 (ISI-6883).
     constraints {
-        implementation('com.google.guava:guava:33.7.2-jre') {
+        implementation('com.google.guava:guava:33.8.0-jre') {
             because 'CVE-2026-102554 — transitive via gRPC'
         }
     }
